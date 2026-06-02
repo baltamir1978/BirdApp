@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		153C63C72FCA4129009682A9 /* MelSpectrogramExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153C63C62FCA4129009682A9 /* MelSpectrogramExtractor.swift */; };
+		15960FBB2FCEC146004DE3BA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 15960FBA2FCEC146004DE3BA /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		153C63982FC9B595009682A9 /* BirdApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BirdApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		153C63C62FCA4129009682A9 /* MelSpectrogramExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelSpectrogramExtractor.swift; sourceTree = "<group>"; };
+		15960FBA2FCEC146004DE3BA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,7 +40,10 @@
 			isa = PBXGroup;
 			children = (
 				153C639A2FC9B595009682A9 /* BirdApp */,
+				153C63C52FCA0029009682A9 /* Frameworks */,
 				153C63992FC9B595009682A9 /* Products */,
+				153C63C62FCA4129009682A9 /* MelSpectrogramExtractor.swift */,
+				15960FBA2FCEC146004DE3BA /* PrivacyInfo.xcprivacy */,
 			);
 			sourceTree = "<group>";
 		};
@@ -43,6 +53,13 @@
 				153C63982FC9B595009682A9 /* BirdApp.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		153C63C52FCA0029009682A9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -91,9 +108,13 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
 			);
 			mainGroup = 153C638F2FC9B595009682A9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				153C63C42FC9FE28009682A9 /* XCRemoteSwiftPackageReference "LiteRT" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 153C63992FC9B595009682A9 /* Products */;
 			projectDirPath = "";
@@ -109,6 +130,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15960FBB2FCEC146004DE3BA /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				153C63C72FCA4129009682A9 /* MelSpectrogramExtractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +279,8 @@
 				DEVELOPMENT_TEAM = JKMR84FU58;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Pájaros uses the microphone to listen for birds and identify them by their song.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +313,8 @@
 				DEVELOPMENT_TEAM = JKMR84FU58;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Pájaros uses the microphone to listen for birds and identify them by their song.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -332,6 +359,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		153C63C42FC9FE28009682A9 /* XCRemoteSwiftPackageReference "LiteRT" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google-ai-edge/LiteRT";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 153C63902FC9B595009682A9 /* Project object */;
 }

@@ -1,0 +1,46 @@
+/* Barra de pestañas */
+"Listen" = "Escuchar";
+"History" = "Historial";
+"Settings" = "Ajustes";
+
+/* ListenView */
+"Birds" = "Pájaros";
+"Listening for birds…" = "Escuchando pájaros…";
+"Tap the button to start" = "Pulsa el botón para comenzar";
+"Mock mode — %@" = "Modo simulado — %@";
+
+/* HistoryView */
+"No Detections Yet" = "Sin detecciones";
+"Identified birds will appear here" = "Los pájaros identificados aparecerán aquí";
+"GPS tagged" = "Con GPS";
+"Clear" = "Borrar";
+"Confidence" = "Confianza";
+"Time" = "Hora";
+"Date" = "Fecha";
+"Location" = "Ubicación";
+
+/* SettingsView */
+"BirdNET Model" = "Modelo BirdNET";
+"Model loaded" = "Modelo cargado";
+"Mock mode" = "Modo simulado";
+"Add BirdNET.mlmodel to the Xcode project to enable real identification. The model updates with each new version of the app." = "Agrega BirdNET.mlmodel al proyecto Xcode para activar la identificación real. El modelo se actualiza con cada nueva versión de la app.";
+"Detection" = "Detección";
+"Confidence Threshold" = "Umbral de confianza";
+"High-Pass Filter" = "Filtro de paso alto";
+"Filter by Location & Season" = "Filtrar por Ubicación y Estación";
+"Narrows detections to species expected in your region at this time of year." = "Limita las detecciones a las especies esperadas en tu región en esta época del año.";
+"About" = "Acerca de";
+"Species Coverage" = "Cobertura de especies";
+"6,000+ worldwide" = "6.000+ en todo el mundo";
+"Inference" = "Inferencia";
+"On-device · offline" = "En dispositivo · sin conexión";
+"BirdNET Project" = "Proyecto BirdNET";
+"whoBIRD (Android)" = "whoBIRD (Android)";
+
+/* ModelManager */
+"Initializing…" = "Inicializando…";
+"BirdNET v2.4 · %@ species" = "BirdNET v2.4 · %@ especies";
+"Add BirdNET_Classifier.mlmodelc to the project" = "Agrega BirdNET_Classifier.mlmodelc al proyecto";
+
+/* AudioAnalyzer */
+"Microphone access denied. Enable it in Settings." = "Acceso al micrófono denegado. Actívalo en Ajustes.";
