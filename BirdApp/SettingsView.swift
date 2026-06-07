@@ -1,9 +1,15 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("confidence_threshold") private var threshold: Double = 0.7
-    @AppStorage("use_location_filter") private var useLocationFilter: Bool = false
+    @AppStorage("confidence_threshold") private var threshold: Double = 0.5
+    @AppStorage("detection_sensitivity") private var sensitivity: Double = 1.0
+    @AppStorage("temporal_smoothing") private var temporalSmoothing: Bool = true
+    @AppStorage("location_filter_influence") private var locationInfluence: Double = 1.0
     @AppStorage("high_pass_filter") private var highPassFilter: Bool = true
+    @AppStorage("high_pass_cutoff") private var highPassCutoff: Double = 200
+    @AppStorage("signal_gate") private var signalGate: Bool = true
+    @AppStorage("clip_gate") private var clipGate: Bool = true
+    @AppStorage("unprocessed_audio") private var unprocessedAudio: Bool = true
     var modelManager: ModelManager
 
     var body: some View {
@@ -33,7 +39,7 @@ struct SettingsView: View {
                 }
 
                 // MARK: Detection
-                Section("Detection") {
+                Section {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Confidence Threshold")
@@ -42,20 +48,73 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                                 .monospacedDigit()
                         }
-                        Slider(value: $threshold, in: 0.5...0.95, step: 0.05)
+                        Slider(value: $threshold, in: 0.3...0.95, step: 0.05)
                     }
                     .padding(.vertical, 4)
 
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Sensitivity")
+                            Spacer()
+                            Text(String(format: "%.2f", sensitivity))
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                        }
+                        Slider(value: $sensitivity, in: 0.5...1.5, step: 0.05)
+                    }
+                    .padding(.vertical, 4)
+
+                    Toggle("Temporal Smoothing", isOn: $temporalSmoothing)
+                } header: {
+                    Text("Detection")
+                } footer: {
+                    Text("Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives.")
+                }
+
+                // MARK: Audio
+                Section {
+                    Toggle("Unprocessed Audio", isOn: $unprocessedAudio)
+                    Toggle("Skip Silence & Low Signal", isOn: $signalGate)
+                    Toggle("Skip Clipped Audio", isOn: $clipGate)
                     Toggle("High-Pass Filter", isOn: $highPassFilter)
+                    if highPassFilter {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Cutoff")
+                                Spacer()
+                                Text("\(Int(highPassCutoff)) Hz")
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                            }
+                            Slider(value: $highPassCutoff, in: 100...1000, step: 50)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                } header: {
+                    Text("Audio")
+                } footer: {
+                    Text("Unprocessed audio disables the system's automatic gain, noise suppression and echo cancellation, which distort bird song. The high-pass filter attenuates low-frequency noise (traffic, wind, mains hum) below the cutoff. Turn any of these off if detection gets worse in your environment.")
                 }
 
                 // MARK: Location
                 Section {
-                    Toggle("Filter by Location & Season", isOn: $useLocationFilter)
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Location & Season Filter")
+                            Spacer()
+                            Text(locationInfluence == 0
+                                 ? NSLocalizedString("Off", comment: "")
+                                 : "\(Int(locationInfluence * 100))%")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                        }
+                        Slider(value: $locationInfluence, in: 0...1, step: 0.1)
+                    }
+                    .padding(.vertical, 4)
                 } header: {
                     Text("Location")
                 } footer: {
-                    Text("Narrows detections to species expected in your region at this time of year.")
+                    Text("Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access.")
                 }
 
                 // MARK: About

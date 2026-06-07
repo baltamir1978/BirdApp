@@ -1,8 +1,24 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
 struct HistoryView: View {
     var store: DetectionStore
+
+    @State private var dayPendingDeletion: Date?
+    @State private var showClearConfirm = false
+
+    private var uniqueSpeciesCount: Int {
+        Set(store.detections.map(\.scientificName)).count
+    }
+
+    // Detections grouped by calendar day, newest day first.
+    private var groups: [(day: Date, items: [BirdDetection])] {
+        let cal = Calendar.current
+        return Dictionary(grouping: store.detections) { cal.startOfDay(for: $0.date) }
+            .map { (day: $0.key, items: $0.value.sorted { $0.date > $1.date }) }
+            .sorted { $0.day > $1.day }
+    }
 
     var body: some View {
         NavigationStack {
@@ -14,9 +30,40 @@ struct HistoryView: View {
                         description: Text("Identified birds will appear here")
                     )
                 } else {
-                    List(store.detections) { detection in
-                        NavigationLink(destination: DetectionDetailView(detection: detection)) {
-                            DetectionRow(detection: detection)
+                    List {
+                        Section {
+                            HStack(spacing: 12) {
+                                StatBox(value: "\(store.detections.count)", label: "Detections")
+                                StatBox(value: "\(uniqueSpeciesCount)", label: "Species")
+                            }
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                            .listRowBackground(Color.clear)
+                        }
+                        ForEach(groups, id: \.day) { group in
+                            Section {
+                                ForEach(group.items) { detection in
+                                    NavigationLink(destination: DetectionDetailView(detection: detection)) {
+                                        DetectionRow(detection: detection)
+                                    }
+                                }
+                                .onDelete { offsets in
+                                    offsets.map { group.items[$0] }.forEach(store.remove)
+                                }
+                            } header: {
+                                HStack {
+                                    Text(Self.dayLabel(group.day))
+                                    Spacer()
+                                    Text("\(group.items.count)")
+                                        .foregroundStyle(.secondary)
+                                    Button {
+                                        dayPendingDeletion = group.day
+                                    } label: {
+                                        Image(systemName: "trash")
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .tint(.red)
+                                }
+                            }
                         }
                     }
                     .listStyle(.insetGrouped)
@@ -25,10 +72,58 @@ struct HistoryView: View {
             .navigationTitle("History")
             .toolbar {
                 if !store.detections.isEmpty {
-                    Button("Clear", role: .destructive) { store.clear() }
+                    ToolbarItem(placement: .topBarLeading) { EditButton() }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Delete All", role: .destructive) { showClearConfirm = true }
+                    }
                 }
             }
+            .confirmationDialog("Delete all detections?",
+                                isPresented: $showClearConfirm, titleVisibility: .visible) {
+                Button("Delete All", role: .destructive) { store.clear() }
+                Button("Cancel", role: .cancel) { }
+            }
+            .confirmationDialog("Delete this day?",
+                                isPresented: Binding(get: { dayPendingDeletion != nil },
+                                                     set: { if !$0 { dayPendingDeletion = nil } }),
+                                titleVisibility: .visible) {
+                Button("Delete", role: .destructive) {
+                    if let day = dayPendingDeletion { store.removeDay(day) }
+                    dayPendingDeletion = nil
+                }
+                Button("Cancel", role: .cancel) { dayPendingDeletion = nil }
+            }
         }
+    }
+
+    // "Today" / "Yesterday" / full date.
+    static func dayLabel(_ day: Date) -> String {
+        let cal = Calendar.current
+        if cal.isDateInToday(day) { return NSLocalizedString("Today", comment: "") }
+        if cal.isDateInYesterday(day) { return NSLocalizedString("Yesterday", comment: "") }
+        return day.formatted(.dateTime.weekday(.wide).day().month(.wide))
+    }
+}
+
+// MARK: - StatBox
+
+struct StatBox: View {
+    let value: String
+    let label: LocalizedStringKey
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.title2.bold().monospacedDigit())
+                .foregroundStyle(Color.accentColor)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(.quaternary.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -74,16 +169,12 @@ struct DetectionRow: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text("\(Int(detection.confidence * 100))%")
                     .font(.headline.monospacedDigit())
-                    .foregroundStyle(confidenceColor(for: detection.confidence))
-                Text(detection.date, style: .relative)
+                    .foregroundStyle(birdConfidenceColor(detection.confidence))
+                Text(detection.date.formatted(date: .omitted, time: .shortened))
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 4)
-    }
-
-    private func confidenceColor(for confidence: Double) -> Color {
-        confidence >= 0.85 ? .green : confidence >= 0.7 ? .orange : .red
     }
 }
 
@@ -91,6 +182,7 @@ struct DetectionRow: View {
 
 struct DetectionDetailView: View {
     let detection: BirdDetection
+    @State private var placeName: String?
 
     var body: some View {
         ScrollView {
@@ -129,7 +221,7 @@ struct DetectionDetailView: View {
                     if let coord = detection.coordinate {
                         MetaCell(icon: "location.fill",
                                  label: "Location",
-                                 value: String(format: "%.4f, %.4f", coord.latitude, coord.longitude),
+                                 value: placeName ?? String(format: "%.4f, %.4f", coord.latitude, coord.longitude),
                                  color: .blue)
                     }
                 }
@@ -151,6 +243,27 @@ struct DetectionDetailView: View {
         }
         .navigationTitle(detection.commonName)
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            guard let coord = detection.coordinate else { return }
+            let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
+            if #available(iOS 26.0, *) {
+                guard let request = MKReverseGeocodingRequest(location: location) else { return }
+                let items = try? await withCheckedThrowingContinuation { (cont: CheckedContinuation<[MKMapItem], Error>) in
+                    request.getMapItems { items, error in
+                        if let error { cont.resume(throwing: error) }
+                        else { cont.resume(returning: items ?? []) }
+                    }
+                }
+                if let reps = items?.first?.addressRepresentations {
+                    placeName = reps.cityWithContext ?? reps.cityName
+                }
+            } else {
+                if let placemark = try? await CLGeocoder().reverseGeocodeLocation(location).first {
+                    placeName = [placemark.locality, placemark.administrativeArea, placemark.country]
+                        .compactMap { $0 }.joined(separator: ", ")
+                }
+            }
+        }
     }
 
     private var placeholder: some View {

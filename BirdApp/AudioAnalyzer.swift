@@ -8,7 +8,8 @@ class AudioAnalyzer {
     private(set) var audioLevel: Float = 0.0
     var errorMessage: String?
 
-    var onDetection: ((BirdDetection) -> Void)?
+    // Emits the ranked candidate list (best first) for one detection event.
+    var onDetections: (([BirdDetection]) -> Void)?
 
     // Injected by ContentView so each detection is tagged with the current GPS fix
     var locationProvider: (() -> CLLocationCoordinate2D?)?
@@ -23,16 +24,16 @@ class AudioAnalyzer {
     func configure(modelPath: String?, labelsPath: String?, weightsPath: String? = nil) {
         birdNet.locationProvider = locationProvider
         birdNet.setup(modelPath: modelPath, labelsPath: labelsPath, weightsPath: weightsPath)
-        birdNet.onDetection = { [weak self] common, scientific, confidence in
+        birdNet.onDetections = { [weak self] candidates in
             guard let self else { return }
             let coord = self.locationProvider?()
-            let detection = BirdDetection(
-                commonName: common,
-                scientificName: scientific,
-                confidence: confidence,
-                coordinate: coord
-            )
-            DispatchQueue.main.async { self.onDetection?(detection) }
+            let detections = candidates.map { c in
+                BirdDetection(commonName: c.common,
+                              scientificName: c.scientific,
+                              confidence: c.confidence,
+                              coordinate: coord)
+            }
+            DispatchQueue.main.async { self.onDetections?(detections) }
         }
     }
 
@@ -61,9 +62,17 @@ class AudioAnalyzer {
     private func startEngine() {
         let session = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(.record, mode: .measurement, options: .duckOthers)
+            // Unprocessed input (.measurement) disables the system's voice DSP
+            // (AGC, noise suppression, echo cancellation) that would distort
+            // bird song — equivalent to whoBIRD's UNPROCESSED audio source.
+            let unprocessed = UserDefaults.standard.bool(forKey: "unprocessed_audio")
+            try session.setCategory(.record, mode: unprocessed ? .measurement : .default)
             try session.setPreferredSampleRate(targetSampleRate)
             try session.setActive(true)
+            // Prefer the built-in mic over Bluetooth/accessory inputs.
+            if let builtIn = session.availableInputs?.first(where: { $0.portType == .builtInMic }) {
+                try? session.setPreferredInput(builtIn)
+            }
         } catch {
             errorMessage = error.localizedDescription
             return

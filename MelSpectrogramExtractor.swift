@@ -2,24 +2,29 @@ import Accelerate
 import CoreML
 import Foundation
 
-// Computes the two log-mel spectrograms expected by the BirdNET v2.4 CoreML classifier.
+// Computes the two spectrograms expected by the BirdNET v2.4 CoreML classifier.
 //
-// Parameters confirmed from TFLite model inspection:
-//   Sample rate : 48 000 Hz
-//   Hop length  : 278 samples  (144 000 / 278 ≈ 511 frames, center=False)
-//   FFT 1 / Mel 1 : window 2048, filterbank [96 × 1025]
-//   FFT 2 / Mel 2 : window 1024, filterbank [96 × 513]
-//   Mel bins    : 96
-//   Frames      : 511
-//   Log scale   : log(mel + 1e-10)
+// IMPORTANT: this is NOT a standard log-mel spectrogram. The exact transform was
+// reverse-engineered from the BirdNET TFLite graph (model/MEL_SPEC1, MEL_SPEC2)
+// and verified to reproduce the model's internal tensors with corr = 1.0:
 //
-// Filterbank source (in order of preference):
-//   1. filterbank1.bin / filterbank2.bin bundled with the app
-//      (extracted from BirdNET TFLite via extract_birdnet.py --filterbanks-only)
-//   2. Computed HTK mel-scale filterbank (mathematically equivalent fallback)
+//   1. Min-max normalise the whole 3 s window to [-1, 1]:
+//          n = (x - min) / (max - min + 1e-6) * 2 - 1
+//   2. Frame the signal and apply a *periodic* Hann window:
+//          w[i] = 0.5 - 0.5·cos(2π·i / N)
+//          SPEC1: N = 2048, hop = 278     SPEC2: N = 1024, hop = 280
+//   3. rfft, then keep the REAL PART only (BirdNET casts the complex spectrum
+//      to float — it does not take magnitude or power).
+//   4. Mel filterbank matrix-multiply (signed result):
+//          m = filterbank · realPart
+//   5. Square, then raise to a fractional power (no log!):
+//          out = (m²) ^ exp        SPEC1 exp = 0.229524…   SPEC2 exp = 0.190527…
+//   6. Reverse the mel-frequency axis (BirdNET's ReverseV2).
+//
+// Filterbanks are loaded from filterbank1.bin / filterbank2.bin (the exact
+// matrices extracted from the BirdNET model, verified byte-identical).
 struct MelSpectrogramExtractor {
 
-    private let hopLength: Int  = 278
     private let numMelBins: Int = 96
     private let numFrames: Int  = 511
 
@@ -27,6 +32,10 @@ struct MelSpectrogramExtractor {
     private let fftSetup1024: FFTSetup?
     private let filterbank2048: [Float]   // flat [96 × 1025]
     private let filterbank1024: [Float]   // flat [96 × 513]
+
+    // Fractional-power exponents (BirdNET MEL_SPEC*/truediv_1, used as Pow_1 exponent)
+    private let exp2048: Float = 0.229524090886116
+    private let exp1024: Float = 0.190527305006981
 
     init() {
         fftSetup2048 = vDSP_create_fftsetup(11, FFTRadix(FFT_RADIX2))
@@ -44,20 +53,36 @@ struct MelSpectrogramExtractor {
     // Returns (spec1, spec2) shaped [1, 96, 511, 1] or nil on failure.
     func extract(from samples: [Float]) -> (MLMultiArray, MLMultiArray)? {
         guard samples.count >= 144_000 else { return nil }
-        guard let s1 = computeLogMel(samples: samples, fftSize: 2048,
-                                     setup: fftSetup2048, filterbank: filterbank2048),
-              let s2 = computeLogMel(samples: samples, fftSize: 1024,
-                                     setup: fftSetup1024, filterbank: filterbank1024)
+
+        // Step 1 — min-max normalise the window to [-1, 1] (shared by both specs).
+        var lo: Float = 0, hi: Float = 0
+        vDSP_minv(samples, 1, &lo, vDSP_Length(samples.count))
+        vDSP_maxv(samples, 1, &hi, vDSP_Length(samples.count))
+        let range = (hi - lo) + 1e-6
+        var norm = [Float](repeating: 0, count: samples.count)
+        var negLo = -lo
+        vDSP_vsadd(samples, 1, &negLo, &norm, 1, vDSP_Length(samples.count)) // x - lo
+        var invRange = 2.0 / range
+        vDSP_vsmul(norm, 1, &invRange, &norm, 1, vDSP_Length(samples.count))  // *2/range
+        var minusOne: Float = -1
+        vDSP_vsadd(norm, 1, &minusOne, &norm, 1, vDSP_Length(samples.count))  // -1
+
+        guard let s1 = computeSpec(samples: norm, fftSize: 2048, hop: 278,
+                                   setup: fftSetup2048, filterbank: filterbank2048, exp: exp2048),
+              let s2 = computeSpec(samples: norm, fftSize: 1024, hop: 280,
+                                   setup: fftSetup1024, filterbank: filterbank1024, exp: exp1024)
         else { return nil }
         return (s1, s2)
     }
 
-    // MARK: - Log-Mel Spectrogram
+    // MARK: - Spectrogram
 
-    private func computeLogMel(samples: [Float],
-                               fftSize: Int,
-                               setup: FFTSetup?,
-                               filterbank: [Float]) -> MLMultiArray? {
+    private func computeSpec(samples: [Float],
+                             fftSize: Int,
+                             hop: Int,
+                             setup: FFTSetup?,
+                             filterbank: [Float],
+                             exp: Float) -> MLMultiArray? {
         guard let setup else { return nil }
 
         let numSpecBins = fftSize / 2 + 1
@@ -66,26 +91,28 @@ struct MelSpectrogramExtractor {
         let outPtr = output.dataPointer.bindMemory(to: Float.self,
                                                    capacity: numMelBins * numFrames)
 
+        // Periodic Hann window: 0.5 - 0.5·cos(2π·i / N)  (matches tf.signal, periodic=True)
         var hann = [Float](repeating: 0, count: fftSize)
-        vDSP_hann_window(&hann, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
+        let twoPiOverN = 2.0 * Float.pi / Float(fftSize)
+        for i in 0..<fftSize { hann[i] = 0.5 - 0.5 * cos(twoPiOverN * Float(i)) }
 
-        var windowed  = [Float](repeating: 0, count: fftSize)
-        var realBuf   = [Float](repeating: 0, count: fftSize / 2)
-        var imagBuf   = [Float](repeating: 0, count: fftSize / 2)
-        var powerBuf  = [Float](repeating: 0, count: numSpecBins)
-        var melBuf    = [Float](repeating: 0, count: numMelBins)
+        var windowed = [Float](repeating: 0, count: fftSize)
+        var realBuf  = [Float](repeating: 0, count: fftSize / 2)
+        var imagBuf  = [Float](repeating: 0, count: fftSize / 2)
+        var realPart = [Float](repeating: 0, count: numSpecBins) // real part of rfft, scaled
+        var melBuf   = [Float](repeating: 0, count: numMelBins)
 
         let log2n = vDSP_Length(log2(Float(fftSize)))
-        let scale = 1.0 / Float(fftSize)
+        let halfScale: Float = 0.5   // vDSP_fft_zrip output is 2× the mathematical FFT
 
         for frameIdx in 0..<numFrames {
-            let start = frameIdx * hopLength
+            let start = frameIdx * hop
 
             // Hann-windowed frame
             vDSP_vmul(Array(samples[start..<start + fftSize]), 1,
                       hann, 1, &windowed, 1, vDSP_Length(fftSize))
 
-            // Pack real → split complex (even→real, odd→imag)
+            // Pack real → split complex, forward FFT
             windowed.withUnsafeMutableBufferPointer { srcPtr in
                 realBuf.withUnsafeMutableBufferPointer { rp in
                     imagBuf.withUnsafeMutableBufferPointer { ip in
@@ -100,24 +127,25 @@ struct MelSpectrogramExtractor {
                 }
             }
 
-            // One-sided power spectrum  |FFT[k]|²  (scaled)
-            powerBuf[0]              = (realBuf[0] * scale) * (realBuf[0] * scale)
-            powerBuf[numSpecBins-1]  = (imagBuf[0] * scale) * (imagBuf[0] * scale)
+            // Real part of the one-sided spectrum (×0.5 to match the true FFT).
+            // Packed layout: realBuf[0] = DC, imagBuf[0] = Nyquist.
+            realPart[0]             = realBuf[0] * halfScale
+            realPart[numSpecBins-1] = imagBuf[0] * halfScale
             for k in 1..<numSpecBins-1 {
-                let r = realBuf[k] * scale; let i = imagBuf[k] * scale
-                powerBuf[k] = r*r + i*i
+                realPart[k] = realBuf[k] * halfScale
             }
 
-            // Mel filterbank: matrix-vector multiply  (96 × numSpecBins) · power
-            // filterbank is stored row-major: filterbank[mel * numSpecBins + k]
+            // Mel filterbank: (96 × numSpecBins) · realPart  (signed)
             vDSP_mmul(filterbank, 1,
-                      powerBuf, 1,
+                      realPart, 1,
                       &melBuf, 1,
                       vDSP_Length(numMelBins), 1, vDSP_Length(numSpecBins))
 
-            // log(mel + ε)
+            // out = (m²) ^ exp, written with the mel axis reversed.
             for mel in 0..<numMelBins {
-                outPtr[mel * numFrames + frameIdx] = log(max(melBuf[mel], 1e-10))
+                let v = melBuf[mel] * melBuf[mel]
+                let out = powf(v, exp)
+                outPtr[(numMelBins - 1 - mel) * numFrames + frameIdx] = out
             }
         }
 

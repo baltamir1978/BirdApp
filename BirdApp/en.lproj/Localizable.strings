@@ -14,6 +14,24 @@
 "Identified birds will appear here" = "Identified birds will appear here";
 "GPS tagged" = "GPS tagged";
 "Clear" = "Clear";
+"Today" = "Today";
+"Yesterday" = "Yesterday";
+"Delete All" = "Delete All";
+"Delete" = "Delete";
+"Cancel" = "Cancel";
+"Delete all detections?" = "Delete all detections?";
+"Delete this day?" = "Delete this day?";
+"Detections" = "Detections";
+"Species" = "Species";
+
+/* Onboarding */
+"Identify bird songs in real time" = "Identify bird songs in real time";
+"Microphone" = "Microphone";
+"Listens to bird song to identify species in real time." = "Listens to bird song to identify species in real time.";
+"Narrows results to the birds expected in your area and season." = "Narrows results to the birds expected in your area and season.";
+"Private & Offline" = "Private & Offline";
+"All recognition runs on your device. Audio never leaves it." = "All recognition runs on your device. Audio never leaves it.";
+"Get Started" = "Get Started";
 "Confidence" = "Confidence";
 "Time" = "Time";
 "Date" = "Date";
@@ -27,7 +45,21 @@
 "Detection" = "Detection";
 "Confidence Threshold" = "Confidence Threshold";
 "High-Pass Filter" = "High-Pass Filter";
+"Sensitivity" = "Sensitivity";
+"Temporal Smoothing" = "Temporal Smoothing";
+"Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives." = "Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives.";
+"Unprocessed Audio" = "Unprocessed Audio";
+"Skip Silence & Low Signal" = "Skip Silence & Low Signal";
+"Skip Clipped Audio" = "Skip Clipped Audio";
+"Cutoff" = "Cutoff";
+"Unprocessed audio disables the system's automatic gain, noise suppression and echo cancellation, which distort bird song. The high-pass filter attenuates low-frequency noise (traffic, wind, mains hum) below the cutoff. Turn any of these off if detection gets worse in your environment." = "Unprocessed audio disables the system's automatic gain, noise suppression and echo cancellation, which distort bird song. The high-pass filter attenuates low-frequency noise (traffic, wind, mains hum) below the cutoff. Turn any of these off if detection gets worse in your environment.";
+"Other possibilities" = "Other possibilities";
+"Audio" = "Audio";
+"Attenuates low-frequency sounds (traffic, wind, mains hum) below ~200 Hz, where there is almost no bird song. Useful in noisy urban environments." = "Attenuates low-frequency sounds (traffic, wind, mains hum) below ~200 Hz, where there is almost no bird song. Useful in noisy urban environments.";
 "Filter by Location & Season" = "Filter by Location & Season";
+"Location & Season Filter" = "Location & Season Filter";
+"Off" = "Off";
+"Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access." = "Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access.";
 "Narrows detections to species expected in your region at this time of year." = "Narrows detections to species expected in your region at this time of year.";
 "About" = "About";
 "Species Coverage" = "Species Coverage";

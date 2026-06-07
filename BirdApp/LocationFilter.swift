@@ -2,33 +2,40 @@ import Accelerate
 import CoreLocation
 import Foundation
 
-// Implements the BirdNET v2.4 meta-model location filter.
+// BirdNET v2.4 location/season meta-model + whoBIRD-style soft filtering.
 //
-// The meta-model predicts which species are plausible at a given
-// latitude / longitude / week-of-year, using a small MLP:
+// The meta-model is a small MLP that predicts how likely each species is at a
+// given latitude / longitude / week-of-year:
 //
-//   [sin(lat·freq), sin(lon·freq), sin(week·freq)]  →  [144]
-//   linear(144→256) + ReLU
-//   linear(256→512) + ReLU
-//   linear(512→1024) + ReLU
-//   linear(1024→6522) — compare logit to threshold (avoids sigmoid)
+//   [lat, lon, week]
+//      → Fourier embedding (144)        ← reverse-engineered from MNET_CONVERT,
+//                                          verified corr 0.9997 vs the TFLite model
+//      → linear(144→256)  + ReLU
+//      → linear(256→512)  + ReLU
+//      → linear(512→1024) + ReLU
+//      → linear(1024→6522) → sigmoid    = per-species occurrence probability
 //
-// Weights are pre-extracted from the TFLite float16 model and stored
-// in meta_weights.bin (28 MB, bundled with the app).
+// Embedding (per scalar input, normalised to `n`):
+//   emb[i] = √2 · sin(2π·n + i·π/48),  i = 0..47
+//   lat_n = (lat + 90)/180   lon_n = (lon + 180)/360   week_n = week/48
+//
+// Weights (W1..b4) are in meta_weights.bin (the leading 48-float block is the
+// old, unused freq vector — kept only to preserve byte offsets).
+//
+// Soft filtering follows whoBIRD: the raw probability is mapped to a stepped
+// score, blended 50/50 with the annual maximum (helps migratory birds), and
+// later combined multiplicatively with the acoustic confidence.
 final class LocationFilter {
 
-    // sigmoid(x) > 0.03  ⟺  x > log(0.03/0.97)
-    private static let logitThreshold: Float = log(0.03 / (1.0 - 0.03))
+    private let W1: [Float], b1: [Float]   // [256×144]
+    private let W2: [Float], b2: [Float]   // [512×256]
+    private let W3: [Float], b3: [Float]   // [1024×512]
+    private let W4: [Float], b4: [Float]   // [6522×1024]
+    private let numClasses = 6522
 
-    private let freq: [Float]   // [48]
-    private let W1: [Float]     // [256 × 144], row-major
-    private let b1: [Float]     // [256]
-    private let W2: [Float]     // [512 × 256]
-    private let b2: [Float]     // [512]
-    private let W3: [Float]     // [1024 × 512]
-    private let b3: [Float]     // [1024]
-    private let W4: [Float]     // [6522 × 1024]
-    private let b4: [Float]     // [6522]
+    // Cached per-species scores in [0,1] for the current location/week.
+    private(set) var metaScores: [Float] = []
+    private var cacheKey: String?
 
     init?(weightsPath: String) {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: weightsPath),
@@ -48,55 +55,98 @@ final class LocationFilter {
         }
 
         guard
-            let f  = read(48),
+            let _  = read(48),                                       // unused freq block
             let w1 = read(256 * 144),  let b1_ = read(256),
             let w2 = read(512 * 256),  let b2_ = read(512),
             let w3 = read(1024 * 512), let b3_ = read(1024),
             let w4 = read(6522 * 1024), let b4_ = read(6522)
         else { return nil }
 
-        freq = f
-        W1 = w1; b1 = b1_
-        W2 = w2; b2 = b2_
-        W3 = w3; b3 = b3_
-        W4 = w4; b4 = b4_
+        W1 = w1; b1 = b1_; W2 = w2; b2 = b2_
+        W3 = w3; b3 = b3_; W4 = w4; b4 = b4_
     }
 
-    // Returns a Bool mask [6522]: true = species is plausible at this location/date.
-    func allowedMask(lat: Double, lon: Double, date: Date) -> [Bool] {
-        let latN = Float(lat / 90.0)
-        let lonN = Float(lon / 180.0)
-        let wkN  = weekNorm(from: date)
+    // Recompute the cached per-species scores for this location/date.
+    // Cheap to call repeatedly: it no-ops unless the rounded location or week changed.
+    func update(lat: Double, lon: Double, date: Date) {
+        let week = Self.weekOfYear(date)
+        let key = "\(Int((lat * 100).rounded()))_\(Int((lon * 100).rounded()))_\(week)"
+        guard key != cacheKey else { return }
+        cacheKey = key
 
-        var features = [Float](repeating: 0, count: 144)
-        for i in 0..<48 {
-            features[i]      = sin(latN * freq[i])
-            features[i + 48] = sin(lonN * freq[i])
-            features[i + 96] = sin(wkN  * freq[i])
+        let current = probabilities(lat: lat, lon: lon, week: week)
+
+        // Annual maximum per species (whoBIRD "extended" mode).
+        var annualMax = [Float](repeating: 0, count: numClasses)
+        for w in 1...48 {
+            let p = probabilities(lat: lat, lon: lon, week: w)
+            vDSP_vmax(p, 1, annualMax, 1, &annualMax, 1, vDSP_Length(numClasses))
         }
 
-        var h1 = linear(W1, b1, rows: 256,  cols: 144,  input: features)
-        relu(&h1)
-        var h2 = linear(W2, b2, rows: 512,  cols: 256,  input: h1)
-        relu(&h2)
-        var h3 = linear(W3, b3, rows: 1024, cols: 512,  input: h2)
-        relu(&h3)
-        let logits = linear(W4, b4, rows: 6522, cols: 1024, input: h3)
+        var scores = [Float](repeating: 0, count: numClasses)
+        for i in 0..<numClasses {
+            scores[i] = 0.5 * Self.step(current[i]) + 0.5 * Self.step(annualMax[i])
+        }
+        metaScores = scores
+    }
 
-        return logits.map { $0 > Self.logitThreshold }
+    // MARK: - Meta-model
+
+    private func probabilities(lat: Double, lon: Double, week: Int) -> [Float] {
+        var features = embedding(lat: lat, lon: lon, week: week)
+        var h1 = linear(W1, b1, rows: 256,  cols: 144,  input: features); relu(&h1)
+        var h2 = linear(W2, b2, rows: 512,  cols: 256,  input: h1);       relu(&h2)
+        var h3 = linear(W3, b3, rows: 1024, cols: 512,  input: h2);       relu(&h3)
+        var logits = linear(W4, b4, rows: numClasses, cols: 1024, input: h3)
+        // sigmoid in place
+        for i in 0..<logits.count { logits[i] = 1 / (1 + exp(-logits[i])) }
+        features.removeAll()
+        return logits
+    }
+
+    // emb[i] = √2 · sin(2π·n + i·π/48) for each of lat/lon/week.
+    private func embedding(lat: Double, lon: Double, week: Int) -> [Float] {
+        let latN  = Float((lat + 90) / 180)
+        let lonN  = Float((lon + 180) / 360)
+        let weekN = Float(week) / 48
+        let twoPi = 2 * Float.pi
+        let step  = Float.pi / 48
+        let sqrt2 = Float(2).squareRoot()
+
+        var f = [Float](repeating: 0, count: 144)
+        for i in 0..<48 {
+            let phase = Float(i) * step
+            f[i]      = sqrt2 * sin(latN  * twoPi + phase)
+            f[i + 48] = sqrt2 * sin(lonN  * twoPi + phase)
+            f[i + 96] = sqrt2 * sin(weekN * twoPi + phase)
+        }
+        return f
+    }
+
+    // whoBIRD stepped score: very-likely → 1, likely → 0.8, possible → 0.5, else 0.
+    private static func step(_ p: Float) -> Float {
+        if p >= 0.01  { return 1.0 }
+        if p >= 0.008 { return 0.8 }
+        if p >= 0.001 { return 0.5 }
+        return 0.0
+    }
+
+    private static func weekOfYear(_ date: Date) -> Int {
+        let cal = Calendar.current
+        let doy = cal.ordinality(of: .day, in: .year, for: date) ?? 1
+        let daysInYear = cal.range(of: .day, in: .year, for: date)?.count ?? 365
+        let week = Int((Double(doy) / Double(daysInYear) * 48).rounded(.up))
+        return max(1, min(48, week))
     }
 
     // MARK: - Math
 
-    // Computes y = W · x + b using vDSP (W is row-major [M × N]).
     private func linear(_ W: [Float], _ b: [Float], rows M: Int, cols N: Int, input x: [Float]) -> [Float] {
         var y = [Float](repeating: 0, count: M)
         W.withUnsafeBufferPointer { wp in
             x.withUnsafeBufferPointer { xp in
                 y.withUnsafeMutableBufferPointer { yp in
-                    vDSP_mmul(wp.baseAddress!, 1,
-                              xp.baseAddress!, 1,
-                              yp.baseAddress!, 1,
+                    vDSP_mmul(wp.baseAddress!, 1, xp.baseAddress!, 1, yp.baseAddress!, 1,
                               vDSP_Length(M), 1, vDSP_Length(N))
                 }
             }
@@ -108,11 +158,5 @@ final class LocationFilter {
     private func relu(_ x: inout [Float]) {
         var zero: Float = 0
         vDSP_vthr(x, 1, &zero, &x, 1, vDSP_Length(x.count))
-    }
-
-    private func weekNorm(from date: Date) -> Float {
-        let doy = Float(Calendar.current.ordinality(of: .day, in: .year, for: date) ?? 1)
-        let week = max(1.0, min(48.0, doy / 365.0 * 48.0))
-        return week / 48.0
     }
 }

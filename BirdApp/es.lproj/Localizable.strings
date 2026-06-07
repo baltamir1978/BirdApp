@@ -14,6 +14,24 @@
 "Identified birds will appear here" = "Los pájaros identificados aparecerán aquí";
 "GPS tagged" = "Con GPS";
 "Clear" = "Borrar";
+"Today" = "Hoy";
+"Yesterday" = "Ayer";
+"Delete All" = "Borrar todo";
+"Delete" = "Borrar";
+"Cancel" = "Cancelar";
+"Delete all detections?" = "¿Borrar todas las detecciones?";
+"Delete this day?" = "¿Borrar este día?";
+"Detections" = "Detecciones";
+"Species" = "Especies";
+
+/* Onboarding */
+"Identify bird songs in real time" = "Identifica cantos de aves en tiempo real";
+"Microphone" = "Micrófono";
+"Listens to bird song to identify species in real time." = "Escucha el canto para identificar especies en tiempo real.";
+"Narrows results to the birds expected in your area and season." = "Acota los resultados a las aves esperadas en tu zona y época.";
+"Private & Offline" = "Privado y sin conexión";
+"All recognition runs on your device. Audio never leaves it." = "Todo el reconocimiento ocurre en tu dispositivo. El audio nunca sale de él.";
+"Get Started" = "Empezar";
 "Confidence" = "Confianza";
 "Time" = "Hora";
 "Date" = "Fecha";
@@ -27,7 +45,21 @@
 "Detection" = "Detección";
 "Confidence Threshold" = "Umbral de confianza";
 "High-Pass Filter" = "Filtro de paso alto";
+"Sensitivity" = "Sensibilidad";
+"Temporal Smoothing" = "Suavizado temporal";
+"Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives." = "La sensibilidad hace que el modelo se anime más o menos a dar una detección. El suavizado temporal exige que una especie se mantenga en varias ventanas solapadas, reduciendo falsos positivos intermitentes.";
+"Unprocessed Audio" = "Audio sin procesar";
+"Skip Silence & Low Signal" = "Omitir silencio y señal baja";
+"Skip Clipped Audio" = "Omitir audio saturado";
+"Cutoff" = "Frecuencia de corte";
+"Unprocessed audio disables the system's automatic gain, noise suppression and echo cancellation, which distort bird song. The high-pass filter attenuates low-frequency noise (traffic, wind, mains hum) below the cutoff. Turn any of these off if detection gets worse in your environment." = "El audio sin procesar desactiva el control automático de ganancia, la supresión de ruido y la cancelación de eco del sistema, que distorsionan el canto. El filtro de paso alto atenúa el ruido grave (tráfico, viento, zumbido) por debajo de la frecuencia de corte. Desactiva cualquiera de estos si la detección empeora en tu entorno.";
+"Other possibilities" = "Otras posibilidades";
+"Audio" = "Audio";
+"Attenuates low-frequency sounds (traffic, wind, mains hum) below ~200 Hz, where there is almost no bird song. Useful in noisy urban environments." = "Atenúa los sonidos graves (tráfico, viento, zumbido eléctrico) por debajo de ~200 Hz, donde casi no hay canto de aves. Útil en entornos urbanos ruidosos.";
 "Filter by Location & Season" = "Filtrar por Ubicación y Estación";
+"Location & Season Filter" = "Filtro por Ubicación y Estación";
+"Off" = "Desactivado";
+"Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access." = "Da más peso a las especies esperadas en tu región en esta época del año, en lugar de descartar el resto por completo. Más alto = mayor preferencia por aves locales; 0% lo desactiva. Necesita acceso a la ubicación.";
 "Narrows detections to species expected in your region at this time of year." = "Limita las detecciones a las especies esperadas en tu región en esta época del año.";
 "About" = "Acerca de";
 "Species Coverage" = "Cobertura de especies";
