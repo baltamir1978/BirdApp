@@ -24,7 +24,8 @@ struct BirdAppApp: App {
             "high_pass_cutoff": 200.0,            // Hz
             "signal_gate": true,                  // skip silence / low-band noise
             "clip_gate": true,                    // skip clipped audio
-            "unprocessed_audio": true             // raw mic input (no system DSP)
+            "unprocessed_audio": true,            // raw mic input (no system DSP)
+            "detection_display_seconds": 8.0      // how long a result stays on screen
         ])
     }
 

@@ -47,7 +47,8 @@
 "High-Pass Filter" = "Filtro de paso alto";
 "Sensitivity" = "Sensibilidad";
 "Temporal Smoothing" = "Suavizado temporal";
-"Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives." = "La sensibilidad hace que el modelo se anime más o menos a dar una detección. El suavizado temporal exige que una especie se mantenga en varias ventanas solapadas, reduciendo falsos positivos intermitentes.";
+"Keep Result On Screen" = "Mantener resultado en pantalla";
+"Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives. Keep result on screen sets how long a detection stays visible before it clears while listening continues." = "La sensibilidad hace que el modelo se anime más o menos a dar una detección. El suavizado temporal exige que una especie se mantenga en varias ventanas solapadas, reduciendo falsos positivos intermitentes. «Mantener resultado en pantalla» define cuánto tiempo permanece visible una detección antes de borrarse mientras sigue la escucha.";
 "Unprocessed Audio" = "Audio sin procesar";
 "Skip Silence & Low Signal" = "Omitir silencio y señal baja";
 "Skip Clipped Audio" = "Omitir audio saturado";
@@ -73,6 +74,11 @@
 "Initializing…" = "Inicializando…";
 "BirdNET v2.4 · %@ species" = "BirdNET v2.4 · %@ especies";
 "Add BirdNET_Classifier.mlmodelc to the project" = "Agrega BirdNET_Classifier.mlmodelc al proyecto";
+
+/* BirdDetailView */
+"Read on Wikipedia" = "Leer en Wikipedia";
+"No description available." = "No hay descripción disponible.";
+"Done" = "Listo";
 
 /* AudioAnalyzer */
 "Microphone access denied. Enable it in Settings." = "Acceso al micrófono denegado. Actívalo en Ajustes.";

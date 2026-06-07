@@ -73,6 +73,13 @@ class AudioAnalyzer {
             if let builtIn = session.availableInputs?.first(where: { $0.portType == .builtInMic }) {
                 try? session.setPreferredInput(builtIn)
             }
+            // `.measurement` mode disables the system AGC, which on iPhone leaves
+            // the raw input level very low — quiet bird song then falls under the
+            // signal gate and is never classified. Push hardware gain to max where
+            // the device allows it to compensate.
+            if session.isInputGainSettable {
+                try? session.setInputGain(1.0)
+            }
         } catch {
             errorMessage = error.localizedDescription
             return

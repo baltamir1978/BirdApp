@@ -5,6 +5,15 @@ struct WikipediaInfo: Sendable {
     let localizedName: String?  // Common name in the device language (nil if en or not found)
 }
 
+// A short article summary for the bird-detail screen, in the app's language
+// when available (otherwise English).
+struct WikipediaArticle: Sendable {
+    let title: String?        // Article title (the localized common name)
+    let extract: String?      // Plain-text intro paragraph
+    let articleURL: URL?      // Full article, in the app language when it exists
+    let imageURL: String?     // Lead thumbnail
+}
+
 // Fetches a bird's Wikipedia thumbnail and localized common name.
 // Image: English Wikipedia (most complete).
 // Localized name: MediaWiki langlinks → fallback to {lang}.wikipedia.org title.
@@ -12,6 +21,7 @@ actor WikipediaImageService {
     static let shared = WikipediaImageService()
 
     private var cache: [String: WikipediaInfo] = [:]
+    private var articleCache: [String: WikipediaArticle] = [:]
 
     func info(for scientificName: String) async -> WikipediaInfo {
         if let cached = cache[scientificName] { return cached }
@@ -30,7 +40,63 @@ actor WikipediaImageService {
         return result
     }
 
+    // Full intro summary + article link for the detail screen. Prefers the app
+    // language: resolves the localized article title via langlinks, then pulls
+    // that article's REST summary; falls back to the English article.
+    func article(for scientificName: String) async -> WikipediaArticle {
+        if let cached = articleCache[scientificName] { return cached }
+
+        let slug = scientificName
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: " ", with: "_")
+        guard !slug.isEmpty else {
+            return WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil)
+        }
+
+        let lang = Self.deviceLang
+        var result = WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil)
+
+        if lang != "en", let localized = await fetchLocalizedName(slug: slug, lang: lang) {
+            let localizedSlug = localized.replacingOccurrences(of: " ", with: "_")
+            let art = await fetchSummary(title: localizedSlug, lang: lang)
+            if art.extract != nil { result = art }
+        }
+        // Fall back to the English article if no localized summary was found.
+        if result.extract == nil {
+            result = await fetchSummary(title: slug, lang: "en")
+        }
+
+        articleCache[scientificName] = result
+        return result
+    }
+
     // MARK: - Helpers
+
+    private func fetchSummary(title: String, lang: String) async -> WikipediaArticle {
+        let encoded = title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? title
+        guard let url = URL(string: "https://\(lang).wikipedia.org/api/rest_v1/page/summary/\(encoded)") else {
+            return WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil)
+        }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard (response as? HTTPURLResponse)?.statusCode == 200,
+                  let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            else { return WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil) }
+
+            let extract = (json["extract"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let pageTitle = json["title"] as? String
+            let pageURL = ((json["content_urls"] as? [String: Any])?["desktop"] as? [String: Any])?["page"] as? String
+            let thumb = (json["thumbnail"] as? [String: Any])?["source"] as? String
+            return WikipediaArticle(
+                title: pageTitle,
+                extract: (extract?.isEmpty == false) ? extract : nil,
+                articleURL: pageURL.flatMap(URL.init),
+                imageURL: thumb
+            )
+        } catch {
+            return WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil)
+        }
+    }
 
     // "es-ES" → "es",  "en-US" → "en"
     private static let deviceLang: String = {

@@ -209,7 +209,10 @@ final class BirdNETAnalyzer: NSObject {
         var meanSq: Float = 0
         vDSP_measqv(x, 1, &meanSq, vDSP_Length(x.count))
         let rms = sqrt(meanSq)
-        if rms < 0.003 { return false }                  // silence
+        // Low floor: with `.measurement` (unprocessed) capture there is no AGC,
+        // so genuine bird song sits near the noise floor in absolute terms. The
+        // bird-band ratio below — not this absolute level — is the real filter.
+        if rms < 0.0005 { return false }                 // near-silence only
 
         let hp = highPassFiltered(x, cutoff: 1500)
         var hpMeanSq: Float = 0

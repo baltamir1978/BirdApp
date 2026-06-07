@@ -10,6 +10,7 @@ struct SettingsView: View {
     @AppStorage("signal_gate") private var signalGate: Bool = true
     @AppStorage("clip_gate") private var clipGate: Bool = true
     @AppStorage("unprocessed_audio") private var unprocessedAudio: Bool = true
+    @AppStorage("detection_display_seconds") private var displaySeconds: Double = 8
     var modelManager: ModelManager
 
     var body: some View {
@@ -65,10 +66,22 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
 
                     Toggle("Temporal Smoothing", isOn: $temporalSmoothing)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Keep Result On Screen")
+                            Spacer()
+                            Text("\(Int(displaySeconds))s")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                        }
+                        Slider(value: $displaySeconds, in: 3...30, step: 1)
+                    }
+                    .padding(.vertical, 4)
                 } header: {
                     Text("Detection")
                 } footer: {
-                    Text("Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives.")
+                    Text("Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives. Keep result on screen sets how long a detection stays visible before it clears while listening continues.")
                 }
 
                 // MARK: Audio

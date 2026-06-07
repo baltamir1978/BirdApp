@@ -114,7 +114,9 @@ struct AudioWaveView: View {
     }
 
     private func barHeight(for index: Int) -> CGFloat {
-        let normalized = CGFloat(min(level * 20, 1.0))
+        // Unprocessed (.measurement) capture has no AGC, so raw RMS is small.
+        // A sqrt curve keeps quiet bird song visible without saturating on voice.
+        let normalized = CGFloat(min(sqrt(max(level, 0)) * 4, 1.0))
         let envelope = sin(.pi * Double(index) / Double(barCount - 1))
         return 8 + 72 * normalized * CGFloat(envelope)
     }
@@ -208,10 +210,15 @@ struct DetectionCard: View {
 struct DetectionResults: View {
     let candidates: [BirdDetection]
 
+    // Tapping any candidate opens its detail sheet (info + Wikipedia link).
+    @State private var selectedBird: BirdDetection?
+
     var body: some View {
         VStack(spacing: 12) {
             if let top = candidates.first {
                 DetectionCard(detection: top)
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedBird = top }
             }
             if candidates.count > 1 {
                 VStack(spacing: 6) {
@@ -222,9 +229,14 @@ struct DetectionResults: View {
                         .padding(.horizontal, 24)
                     ForEach(Array(candidates.dropFirst().enumerated()), id: \.element.id) { index, c in
                         CandidateRow(detection: c, showImage: index == 0) // index 0 here = 2nd overall
+                            .contentShape(Rectangle())
+                            .onTapGesture { selectedBird = c }
                     }
                 }
             }
+        }
+        .sheet(item: $selectedBird) { bird in
+            BirdDetailView(detection: bird)
         }
     }
 }

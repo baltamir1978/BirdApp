@@ -11,6 +11,10 @@ class DetectionStore {
 
     private let storageKey = "bird_detections"
 
+    // Auto-clears the live candidates after a period of no new detections, so a
+    // stale result doesn't linger on screen while listening continues.
+    private var clearTask: Task<Void, Never>?
+
     init() {
         load()
     }
@@ -27,6 +31,21 @@ class DetectionStore {
             detections.insert(top, at: 0)
             latestDetection = top
             save()
+        }
+        scheduleAutoClear()
+    }
+
+    // Schedule clearing the live candidates after the configured display time.
+    // A new detection resets the timer (cancels the pending clear). History is
+    // untouched — only the on-screen ListenView result is dismissed.
+    private func scheduleAutoClear() {
+        clearTask?.cancel()
+        let registered = UserDefaults.standard.double(forKey: "detection_display_seconds")
+        let seconds = registered > 0 ? registered : 8
+        clearTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            self?.latestCandidates = []
         }
     }
 
