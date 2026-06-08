@@ -7,7 +7,14 @@
 "Birds" = "Pájaros";
 "Listening for birds…" = "Escuchando pájaros…";
 "Tap the button to start" = "Pulsa el botón para comenzar";
+"Analyzing sound…" = "Analizando sonido…";
+"Possible:" = "Posible:";
+"Listening to confirm…" = "Escuchando para confirmar…";
 "Mock mode — %@" = "Modo simulado — %@";
+
+/* Siri / Atajos */
+"Identify a Bird" = "Identificar un pájaro";
+"Open the app and start listening to identify the birds around you." = "Abre la app y empieza a escuchar para identificar los pájaros a tu alrededor.";
 
 /* HistoryView */
 "No Detections Yet" = "Sin detecciones";

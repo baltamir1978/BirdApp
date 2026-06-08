@@ -9,17 +9,21 @@ struct ContentView: View {
 
     @AppStorage("onboarding_done") private var onboardingDone = false
     @State private var showOnboarding = false
+    @State private var selectedTab = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             ListenView(analyzer: analyzer, store: store, modelManager: modelManager)
                 .tabItem { Label("Listen", systemImage: "mic.fill") }
+                .tag(0)
 
             HistoryView(store: store)
                 .tabItem { Label("History", systemImage: "clock.fill") }
+                .tag(1)
 
             SettingsView(modelManager: modelManager)
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+                .tag(2)
         }
         .onAppear {
             configure()
@@ -28,6 +32,21 @@ struct ContentView: View {
             } else {
                 showOnboarding = true
             }
+        }
+        // Siri / Shortcuts asked us to start identifying — jump to Listen and
+        // start the mic (the app may already be foregrounded and stopped).
+        .onReceive(NotificationCenter.default.publisher(for: .startBirdListening)) { _ in
+            guard onboardingDone else { return }
+            selectedTab = 0
+            startCapture()
+        }
+        // Widget "Stop" reached us via a Darwin signal re-posted as this notification.
+        .onReceive(NotificationCenter.default.publisher(for: .stopBirdListening)) { _ in
+            analyzer.stopListening()
+        }
+        // Keep the widgets' listening indicator in sync with the live state.
+        .onChange(of: analyzer.isListening) { _, listening in
+            BirdWidgetData.setListening(listening)
         }
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView {
@@ -45,19 +64,34 @@ struct ContentView: View {
         }
         analyzer.configure(modelPath: modelManager.modelPath,
                            labelsPath: modelManager.labelsPath,
+                           localizedLabelsPath: modelManager.localizedLabelsPath,
                            weightsPath: modelManager.weightsPath)
 
         analyzer.onDetections = { [store] detections in
             Task { @MainActor in
                 var enriched = detections
-                // Only the top 2 candidates get a photo + localized name; the
-                // rest are shown by name only.
+                // The native common name already comes from the bundled localized
+                // labels. Only the top 2 candidates fetch a Wikipedia photo (and a
+                // name only as a fallback if the labels lacked one).
                 for i in enriched.indices where i < 2 {
                     let info = await WikipediaImageService.shared.info(for: enriched[i].scientificName)
                     enriched[i].imageURL = info.imageURL
-                    enriched[i].localizedName = info.localizedName
+                    if enriched[i].localizedName?.isEmpty ?? true {
+                        enriched[i].localizedName = info.localizedName
+                    }
                 }
                 store.setCandidates(enriched)
+
+                // Mirror the top result to the App Group so the widgets update.
+                if let top = enriched.first {
+                    BirdWidgetData.save(BirdSnapshot(
+                        name: top.displayName,
+                        scientific: top.scientificName,
+                        confidence: top.confidence,
+                        imageURL: top.imageURL,
+                        date: top.date,
+                        isListening: analyzer.isListening))
+                }
             }
         }
     }

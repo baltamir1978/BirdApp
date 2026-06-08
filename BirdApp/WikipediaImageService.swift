@@ -23,6 +23,15 @@ actor WikipediaImageService {
     private var cache: [String: WikipediaInfo] = [:]
     private var articleCache: [String: WikipediaArticle] = [:]
 
+    // Wikimedia asks API clients to send a descriptive User-Agent; the default
+    // URLSession one can be rate-limited or blocked, which silently breaks the
+    // summary endpoint. A dedicated session adds ours to every request.
+    private static let session: URLSession = {
+        let cfg = URLSessionConfiguration.default
+        cfg.httpAdditionalHeaders = ["User-Agent": "BirdApp/1.0 (iOS bird identification app)"]
+        return URLSession(configuration: cfg)
+    }()
+
     func info(for scientificName: String) async -> WikipediaInfo {
         if let cached = cache[scientificName] { return cached }
 
@@ -56,9 +65,14 @@ actor WikipediaImageService {
         let lang = Self.deviceLang
         var result = WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil)
 
-        if lang != "en", let localized = await fetchLocalizedName(slug: slug, lang: lang) {
-            let localizedSlug = localized.replacingOccurrences(of: " ", with: "_")
-            let art = await fetchSummary(title: localizedSlug, lang: lang)
+        if lang != "en" {
+            // Prefer the localized common-name article; but many {lang} Wikipedias
+            // title the article with the scientific name itself (e.g. es.wikipedia
+            // "Turdus merula"), so fall back to the scientific slug — it still has a
+            // summary in the local language.
+            let localizedTitle = (await fetchLocalizedName(slug: slug, lang: lang))?
+                .replacingOccurrences(of: " ", with: "_") ?? slug
+            let art = await fetchSummary(title: localizedTitle, lang: lang)
             if art.extract != nil { result = art }
         }
         // Fall back to the English article if no localized summary was found.
@@ -78,7 +92,7 @@ actor WikipediaImageService {
             return WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil)
         }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await Self.session.data(from: url)
             guard (response as? HTTPURLResponse)?.statusCode == 200,
                   let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             else { return WikipediaArticle(title: nil, extract: nil, articleURL: nil, imageURL: nil) }
@@ -152,7 +166,7 @@ actor WikipediaImageService {
         guard let url = URL(string: "https://\(lang).wikipedia.org/api/rest_v1/page/summary/\(slug)")
         else { return nil }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await Self.session.data(from: url)
             guard (response as? HTTPURLResponse)?.statusCode == 200,
                   let json  = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let title = json["title"] as? String,
@@ -169,7 +183,7 @@ actor WikipediaImageService {
     }
 
     private func wikiPage(url: URL) async throws -> [String: Any]? {
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await Self.session.data(from: url)
         guard (response as? HTTPURLResponse)?.statusCode == 200,
               let json  = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let query = json["query"] as? [String: Any],

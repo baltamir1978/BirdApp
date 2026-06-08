@@ -5,7 +5,7 @@ struct BirdDetection: Identifiable, Codable {
     let id: UUID
     let commonName: String
     let scientificName: String
-    let confidence: Double
+    var confidence: Double
     let date: Date
     let latitude: Double?
     let longitude: Double?

@@ -183,6 +183,8 @@ struct DetectionRow: View {
 struct DetectionDetailView: View {
     let detection: BirdDetection
     @State private var placeName: String?
+    @State private var article: WikipediaArticle?
+    @State private var isLoadingArticle = true
 
     var body: some View {
         ScrollView {
@@ -204,6 +206,30 @@ struct DetectionDetailView: View {
                 VStack(spacing: 6) {
                     Text(detection.displayName).font(.title.bold())
                     Text(detection.scientificName).font(.title3).italic().foregroundStyle(.secondary)
+                }
+
+                // Wikipedia summary + link (in the app language, English fallback)
+                if isLoadingArticle {
+                    ProgressView().padding(.top, 4)
+                } else if let article, (article.extract?.isEmpty == false) || article.articleURL != nil {
+                    VStack(spacing: 12) {
+                        if let extract = article.extract, !extract.isEmpty {
+                            Text(extract)
+                                .font(.body)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        if let url = article.articleURL {
+                            Link(destination: url) {
+                                Label("Read on Wikipedia", systemImage: "safari.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(Color.accentColor.opacity(0.12))
+                                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
 
                 // Metadata grid
@@ -241,8 +267,12 @@ struct DetectionDetailView: View {
                 }
             }
         }
-        .navigationTitle(detection.commonName)
+        .navigationTitle(detection.displayName)
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            article = await WikipediaImageService.shared.article(for: detection.scientificName)
+            isLoadingArticle = false
+        }
         .task {
             guard let coord = detection.coordinate else { return }
             let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)

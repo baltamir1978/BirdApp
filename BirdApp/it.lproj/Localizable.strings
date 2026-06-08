@@ -1,0 +1,91 @@
+/* Barra schede */
+"Listen" = "Ascolta";
+"History" = "Cronologia";
+"Settings" = "Impostazioni";
+
+/* ListenView */
+"Birds" = "Uccelli";
+"Listening for birds…" = "In ascolto degli uccelli…";
+"Tap the button to start" = "Tocca il pulsante per iniziare";
+"Analyzing sound…" = "Analisi del suono…";
+"Possible:" = "Possibile:";
+"Listening to confirm…" = "In ascolto per confermare…";
+"Mock mode — %@" = "Modalità demo — %@";
+
+/* Siri / Comandi rapidi */
+"Identify a Bird" = "Identifica un uccello";
+"Open the app and start listening to identify the birds around you." = "Apre l'app e ascolta per identificare gli uccelli intorno a te.";
+
+/* HistoryView */
+"No Detections Yet" = "Nessun rilevamento";
+"Identified birds will appear here" = "Gli uccelli identificati appariranno qui";
+"GPS tagged" = "Con GPS";
+"Clear" = "Cancella";
+"Today" = "Oggi";
+"Yesterday" = "Ieri";
+"Delete All" = "Elimina tutto";
+"Delete" = "Elimina";
+"Cancel" = "Annulla";
+"Delete all detections?" = "Eliminare tutti i rilevamenti?";
+"Delete this day?" = "Eliminare questo giorno?";
+"Detections" = "Rilevamenti";
+"Species" = "Specie";
+
+/* Onboarding */
+"Identify bird songs in real time" = "Identifica i canti degli uccelli in tempo reale";
+"Microphone" = "Microfono";
+"Listens to bird song to identify species in real time." = "Ascolta il canto degli uccelli per identificare le specie in tempo reale.";
+"Narrows results to the birds expected in your area and season." = "Restringe i risultati agli uccelli previsti nella tua zona e stagione.";
+"Private & Offline" = "Privato e offline";
+"All recognition runs on your device. Audio never leaves it." = "Tutto il riconoscimento avviene sul tuo dispositivo. L'audio non lo lascia mai.";
+"Get Started" = "Inizia";
+"Confidence" = "Affidabilità";
+"Time" = "Ora";
+"Date" = "Data";
+"Location" = "Luogo";
+
+/* SettingsView */
+"BirdNET Model" = "Modello BirdNET";
+"Model loaded" = "Modello caricato";
+"Mock mode" = "Modalità demo";
+"Add BirdNET.mlmodel to the Xcode project to enable real identification. The model updates with each new version of the app." = "Aggiungi BirdNET.mlmodel al progetto Xcode per abilitare l'identificazione reale. Il modello si aggiorna a ogni nuova versione dell'app.";
+"Detection" = "Rilevamento";
+"Confidence Threshold" = "Soglia di affidabilità";
+"High-Pass Filter" = "Filtro passa-alto";
+"Sensitivity" = "Sensibilità";
+"Temporal Smoothing" = "Livellamento temporale";
+"Keep Result On Screen" = "Mantieni il risultato sullo schermo";
+"Sensitivity makes the model more or less eager to call a detection. Temporal smoothing requires a species to persist across several overlapping windows, reducing flickering false positives. Keep result on screen sets how long a detection stays visible before it clears while listening continues." = "La sensibilità rende il modello più o meno propenso a segnalare un rilevamento. Il livellamento temporale richiede che una specie persista su più finestre sovrapposte, riducendo i falsi positivi intermittenti. «Mantieni il risultato sullo schermo» definisce per quanto tempo un rilevamento resta visibile prima di scomparire mentre l'ascolto continua.";
+"Unprocessed Audio" = "Audio non elaborato";
+"Skip Silence & Low Signal" = "Salta silenzio e segnale debole";
+"Skip Clipped Audio" = "Salta audio saturato";
+"Cutoff" = "Frequenza di taglio";
+"Unprocessed audio disables the system's automatic gain, noise suppression and echo cancellation, which distort bird song. The high-pass filter attenuates low-frequency noise (traffic, wind, mains hum) below the cutoff. Turn any of these off if detection gets worse in your environment." = "L'audio non elaborato disattiva il guadagno automatico, la soppressione del rumore e la cancellazione dell'eco del sistema, che distorcono il canto. Il filtro passa-alto attenua i rumori bassi (traffico, vento, ronzio di rete) sotto la frequenza di taglio. Disattiva uno di questi se il rilevamento peggiora nel tuo ambiente.";
+"Other possibilities" = "Altre possibilità";
+"Audio" = "Audio";
+"Attenuates low-frequency sounds (traffic, wind, mains hum) below ~200 Hz, where there is almost no bird song. Useful in noisy urban environments." = "Attenua i suoni bassi (traffico, vento, ronzio elettrico) sotto i ~200 Hz, dove non c'è quasi canto di uccelli. Utile in ambienti urbani rumorosi.";
+"Filter by Location & Season" = "Filtra per luogo e stagione";
+"Location & Season Filter" = "Filtro per luogo e stagione";
+"Off" = "Disattivato";
+"Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access." = "Dà più peso alle specie previste nella tua regione in questo periodo dell'anno, invece di escludere del tutto le altre. Più alto = preferenza maggiore per gli uccelli locali; 0% lo disattiva. Richiede l'accesso alla posizione.";
+"Narrows detections to species expected in your region at this time of year." = "Limita i rilevamenti alle specie previste nella tua regione in questo periodo dell'anno.";
+"About" = "Informazioni";
+"Species Coverage" = "Copertura delle specie";
+"6,000+ worldwide" = "6.000+ nel mondo";
+"Inference" = "Inferenza";
+"On-device · offline" = "Sul dispositivo · offline";
+"BirdNET Project" = "Progetto BirdNET";
+"whoBIRD (Android)" = "whoBIRD (Android)";
+
+/* ModelManager */
+"Initializing…" = "Inizializzazione…";
+"BirdNET v2.4 · %@ species" = "BirdNET v2.4 · %@ specie";
+"Add BirdNET_Classifier.mlmodelc to the project" = "Aggiungi BirdNET_Classifier.mlmodelc al progetto";
+
+/* BirdDetailView */
+"Read on Wikipedia" = "Leggi su Wikipedia";
+"No description available." = "Nessuna descrizione disponibile.";
+"Done" = "Fine";
+
+/* AudioAnalyzer */
+"Microphone access denied. Enable it in Settings." = "Accesso al microfono negato. Attivalo in Impostazioni.";

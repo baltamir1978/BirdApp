@@ -7,22 +7,43 @@
 
 import SwiftUI
 
+// C-compatible Darwin callback: a "Stop" tapped in the widget (a separate
+// process) fires this; we re-post it as a normal Notification ContentView observes.
+private func birdStopDarwinCallback(_ center: CFNotificationCenter?,
+                                    _ observer: UnsafeMutableRawPointer?,
+                                    _ name: CFNotificationName?,
+                                    _ object: UnsafeRawPointer?,
+                                    _ userInfo: CFDictionary?) {
+    DispatchQueue.main.async {
+        NotificationCenter.default.post(name: .stopBirdListening, object: nil)
+    }
+}
+
 @main
 struct BirdAppApp: App {
     init() {
+        // Listen for the widget's cross-process "Stop" signal.
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            nil,
+            birdStopDarwinCallback,
+            birdStopDarwinName,
+            nil,
+            .deliverImmediately)
+
         // Register default values so code that reads UserDefaults directly
         // (e.g. BirdNETAnalyzer) sees the same defaults as the @AppStorage
         // bindings in SettingsView. Without this, `bool(forKey:)` returns
         // false for any key the user has never toggled — which silently
         // disabled the location/season filter for everyone.
         UserDefaults.standard.register(defaults: [
-            "confidence_threshold": 0.5,          // whoBIRD-style lower default
-            "detection_sensitivity": 1.0,         // sigmoid slope (0.5 … 1.5)
-            "temporal_smoothing": true,           // consensus over overlapping windows
-            "location_filter_influence": 1.0,     // 0 = off … 1 = full (soft filter)
-            "high_pass_filter": true,
+            "confidence_threshold": 0.35,         // lower default — catch quieter / less certain birds
+            "detection_sensitivity": 1.3,         // sigmoid slope (0.5 … 1.5); higher = more eager
+            "temporal_smoothing": false,          // consensus over overlapping windows
+            "location_filter_influence": 0.7,     // 0 = off … 1 = full (soft filter)
+            "high_pass_filter": false,
             "high_pass_cutoff": 200.0,            // Hz
-            "signal_gate": true,                  // skip silence / low-band noise
+            "signal_gate": false,                 // skip silence / low-band noise
             "clip_gate": true,                    // skip clipped audio
             "unprocessed_audio": true,            // raw mic input (no system DSP)
             "detection_display_seconds": 8.0      // how long a result stays on screen

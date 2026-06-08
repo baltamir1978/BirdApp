@@ -11,6 +11,12 @@ class DetectionStore {
 
     private let storageKey = "bird_detections"
 
+    // History de-duplication: while the same species keeps being detected, collapse
+    // it into a single history entry instead of one per ~0.8 s analysis window. A new
+    // entry for that species is only started once this much time has passed since the
+    // previous one (matches the user's "added once per ~10 minutes" expectation).
+    private let dedupWindow: TimeInterval = 600   // 10 minutes
+
     // Auto-clears the live candidates after a period of no new detections, so a
     // stale result doesn't linger on screen while listening continues.
     private var clearTask: Task<Void, Never>?
@@ -20,19 +26,34 @@ class DetectionStore {
     }
 
     func add(_ detection: BirdDetection) {
-        detections.insert(detection, at: 0)
         latestDetection = detection
-        save()
+        record(detection)
     }
 
     func setCandidates(_ candidates: [BirdDetection]) {
         latestCandidates = candidates
         if let top = candidates.first {
-            detections.insert(top, at: 0)
             latestDetection = top
-            save()
+            record(top)
         }
         scheduleAutoClear()
+    }
+
+    // Insert into history, collapsing a continuing run of the same species into one
+    // entry. If that species was already logged within `dedupWindow`, just keep the
+    // best confidence on the existing entry instead of adding a duplicate.
+    private func record(_ detection: BirdDetection) {
+        if let idx = detections.firstIndex(where: {
+            $0.scientificName == detection.scientificName &&
+            detection.date.timeIntervalSince($0.date) < dedupWindow
+        }) {
+            if detection.confidence > detections[idx].confidence {
+                detections[idx].confidence = detection.confidence
+            }
+        } else {
+            detections.insert(detection, at: 0)
+        }
+        save()
     }
 
     // Schedule clearing the live candidates after the configured display time.

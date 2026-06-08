@@ -1,0 +1,3 @@
+CFBundleDisplayName = "Vögel";
+NSMicrophoneUsageDescription = "Vögel verwendet das Mikrofon, um Vögel zu hören und an ihrem Gesang zu bestimmen.";
+NSLocationWhenInUseUsageDescription = "Vögel verwendet deinen Standort, um Funde auf die Vögel deiner Region einzugrenzen.";

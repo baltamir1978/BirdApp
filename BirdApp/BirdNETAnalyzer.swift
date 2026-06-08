@@ -15,15 +15,24 @@ import CoreLocation
 // Model output:  classifierOutput [1, N]  — raw logits per species (apply sigmoid)
 final class BirdNETAnalyzer: NSObject {
 
-    typealias Candidate = (common: String, scientific: String, confidence: Double)
+    typealias Candidate = (common: String, scientific: String, localized: String?, confidence: Double)
 
     // Emits the ranked list of candidates above threshold (best first).
     var onDetections: (([Candidate]) -> Void)?
     var locationProvider: (() -> CLLocationCoordinate2D?)?
     private(set) var usingRealModel = false
 
+    // Live pipeline feedback for the UI's "what is the model doing" indicator.
+    // `onAnalyzing`  — a window cleared the gates and is going through the model.
+    // `onThinking`   — best guess so far, still below the confidence threshold.
+    // `onIdleWindow` — a window was rejected (silence/clip) or produced nothing.
+    var onAnalyzing: (() -> Void)?
+    var onThinking: ((_ name: String, _ confidence: Double) -> Void)?
+    var onIdleWindow: (() -> Void)?
+
     private var classifier: MLModel?
     private var labels: [String] = []
+    private var localizedCommon: [String] = []   // common names in the device language, by index
     private var locationFilter: LocationFilter?
     private let melExtractor = MelSpectrogramExtractor()
 
@@ -37,17 +46,30 @@ final class BirdNETAnalyzer: NSObject {
 
     // MARK: - Setup
 
-    func setup(modelPath: String?, labelsPath: String?, weightsPath: String? = nil) {
+    func setup(modelPath: String?, labelsPath: String?, localizedLabelsPath: String? = nil, weightsPath: String? = nil) {
         classifier = nil
         usingRealModel = false
         accumulator = []
         smoothingHistory = []
         labels = []
+        localizedCommon = []
         locationFilter = nil
 
         if let path = labelsPath,
            let content = try? String(contentsOfFile: path, encoding: .utf8) {
             labels = content.split(separator: "\n").map(String.init).filter { !$0.isEmpty }
+        }
+
+        // Parallel array of common names in the device language (same index order
+        // as `labels`). Only the common-name half of each "Scientific_Common" row.
+        if let path = localizedLabelsPath,
+           let content = try? String(contentsOfFile: path, encoding: .utf8) {
+            localizedCommon = content.split(separator: "\n").map { line in
+                let parts = line.split(separator: "_", maxSplits: 1)
+                return parts.count > 1 ? String(parts[1]) : String(line)
+            }
+            // Guard against a mismatched file — only trust a 1:1 alignment.
+            if localizedCommon.count != labels.count { localizedCommon = [] }
         }
 
         if let path = weightsPath {
@@ -83,7 +105,7 @@ final class BirdNETAnalyzer: NSObject {
             } else {
                 mockIdentifier.identify(samples: window) { [weak self] detection in
                     guard let d = detection else { return }
-                    self?.onDetections?([(d.commonName, d.scientificName, d.confidence)])
+                    self?.onDetections?([(d.commonName, d.scientificName, nil, d.confidence)])
                 }
             }
         }
@@ -97,8 +119,11 @@ final class BirdNETAnalyzer: NSObject {
         let d = UserDefaults.standard
 
         // Signal-quality gates (run on raw audio, before the expensive model).
-        if d.bool(forKey: "clip_gate"), Self.isClipped(samples) { return }
-        if d.bool(forKey: "signal_gate"), !Self.hasBirdSignal(samples) { return }
+        if d.bool(forKey: "clip_gate"), Self.isClipped(samples) { onIdleWindow?(); return }
+        if d.bool(forKey: "signal_gate"), !Self.hasBirdSignal(samples) { onIdleWindow?(); return }
+
+        // A window worth classifying — tell the UI the model is working on it.
+        onAnalyzing?()
 
         // Optional high-pass — removes low-frequency noise (traffic, wind, hum)
         // before BirdNET's per-window min-max normalisation.
@@ -176,12 +201,29 @@ final class BirdNETAnalyzer: NSObject {
             guard scores[i] >= threshold else { return nil }
             let label = i < labels.count ? labels[i] : "Unknown_Unknown"
             let parts = label.split(separator: "_", maxSplits: 1).map(String.init)
+            let localized = i < localizedCommon.count ? localizedCommon[i] : nil
             return (common: parts.count > 1 ? parts[1] : label,
                     scientific: parts.first ?? label,
+                    localized: localized,
                     confidence: Double(scores[i]))
         }
 
-        guard !candidates.isEmpty else { return }
+        guard !candidates.isEmpty else {
+            // Nothing crossed the threshold — surface the single best guess so the
+            // UI can show the model "narrowing in" before a confirmed detection.
+            if let best = scores.indices.max(by: { scores[$0] < scores[$1] }),
+               scores[best] > 0.15 {
+                let label = best < labels.count ? labels[best] : "Unknown_Unknown"
+                let parts = label.split(separator: "_", maxSplits: 1).map(String.init)
+                let localized = best < localizedCommon.count ? localizedCommon[best] : nil
+                let name = localized?.isEmpty == false ? localized!
+                         : (parts.count > 1 ? parts[1] : label)
+                onThinking?(name, Double(scores[best]))
+            } else {
+                onIdleWindow?()
+            }
+            return
+        }
         onDetections?(candidates)
     }
 

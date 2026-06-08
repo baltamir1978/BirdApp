@@ -19,6 +19,7 @@ final class ModelManager {
 
     private(set) var modelPath: String?
     private(set) var labelsPath: String?
+    private(set) var localizedLabelsPath: String?   // Common names in the device language, if bundled
     private(set) var weightsPath: String?
 
     init() {
@@ -41,6 +42,8 @@ final class ModelManager {
                   ?? Bundle.main.path(forResource: "BirdNET_Labels",                 ofType: "txt")
                   ?? Bundle.main.path(forResource: "BirdNET",                        ofType: "txt")
 
+        localizedLabelsPath = Self.localizedLabels()
+
         weightsPath = Bundle.main.path(forResource: "meta_weights", ofType: "bin")
 
         if modelPath != nil {
@@ -52,6 +55,32 @@ final class ModelManager {
             statusMessage = NSLocalizedString("Add BirdNET_Classifier.mlmodelc to the project",
                                               comment: "")
         }
+    }
+
+    // Picks the bundled common-name labels matching the device language, if any.
+    // Files are named BirdNET_GLOBAL_6K_V2.4_Labels_<suffix>.txt (37 locales from
+    // whoBIRD, same species order as the model). Returns nil for English/unknown,
+    // where the base labels' English common names are used instead.
+    private static func localizedLabels() -> String? {
+        let pref = Locale.preferredLanguages.first ?? "en"
+        let parts = pref.replacingOccurrences(of: "-", with: "_").split(separator: "_")
+        let lang = parts.first.map { String($0).lowercased() } ?? "en"
+        let region = parts.count > 1 ? String(parts[1]).lowercased() : nil
+
+        guard lang != "en" || region == "gb" else { return nil }  // base labels are English
+
+        // Try, in order: regional variant, English-UK special case, bare language.
+        var candidates: [String] = []
+        if let region { candidates.append("\(lang)_\(region.uppercased())") }   // e.g. pt_BR, pt_PT
+        if lang == "en", region == "gb" { candidates.append("en_uk") }
+        candidates.append(lang)                                                 // e.g. es, de, fr
+
+        for suffix in candidates {
+            if let p = Bundle.main.path(forResource: "BirdNET_GLOBAL_6K_V2.4_Labels_\(suffix)", ofType: "txt") {
+                return p
+            }
+        }
+        return nil
     }
 
     private func speciesCount() -> String {

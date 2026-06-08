@@ -5,6 +5,10 @@ struct ListenView: View {
     var store: DetectionStore
     var modelManager: ModelManager
 
+    // Owned here (not in DetectionResults) so the detail sheet survives the
+    // live results being auto-cleared during a quiet spell while reading.
+    @State private var selectedBird: BirdDetection?
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 32) {
@@ -15,18 +19,17 @@ struct ListenView: View {
 
                 Spacer()
 
-                AudioWaveView(level: analyzer.audioLevel)
+                BirdWaveView(level: analyzer.audioLevel, isListening: analyzer.isListening)
                     .frame(height: 100)
                     .padding(.horizontal)
 
                 Group {
                     if !store.latestCandidates.isEmpty {
-                        DetectionResults(candidates: store.latestCandidates)
+                        DetectionResults(candidates: store.latestCandidates,
+                                         selectedBird: $selectedBird)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                     } else {
-                        Text(analyzer.isListening ? "Listening for birds…" : "Tap the button to start")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        AnalysisStatusView(phase: analyzer.phase)
                     }
                 }
                 .animation(.spring(response: 0.4), value: store.latestCandidates.first?.id)
@@ -48,6 +51,9 @@ struct ListenView: View {
                 }
             }
             .navigationTitle("Birds")
+            .sheet(item: $selectedBird) { bird in
+                BirdDetailView(detection: bird)
+            }
         }
     }
 }
@@ -96,29 +102,135 @@ struct MicButton: View {
     }
 }
 
-// MARK: - AudioWaveView
+// MARK: - BirdWaveView
 
-struct AudioWaveView: View {
+// A side-profile bird silhouette that fills with green from the bottom up as the
+// audio level rises, and gently scales up on louder song, with sound ripples
+// emanating behind it. Replaces the old VU bar meter.
+struct BirdWaveView: View {
     let level: Float
-    private let barCount = 36
+    let isListening: Bool
+
+    private let symbol = "bird.fill"   // SF Symbol — a side-on songbird
 
     var body: some View {
-        HStack(spacing: 3) {
-            ForEach(0..<barCount, id: \.self) { i in
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.accentColor.opacity(0.75))
-                    .frame(width: 5, height: barHeight(for: i))
-                    .animation(.spring(response: 0.12, dampingFraction: 0.6), value: level)
+        // Map raw RMS to [0,1]. Unprocessed (.measurement) capture has no AGC so
+        // raw RMS is small — the sqrt curve keeps quiet song visible.
+        let amp = CGFloat(min(sqrt(max(level, 0)) * 4, 1.0))
+        // How far the green fill has risen inside the silhouette (always a little
+        // so the bird never fully disappears).
+        let fillFraction = isListening ? 0.18 + amp * 0.82 : 0.12
+
+        TimelineView(.animation) { timeline in
+            let t = timeline.date.timeIntervalSinceReferenceDate
+
+            GeometryReader { geo in
+                let h = geo.size.height
+                let birdW = h * 1.3
+
+                ZStack {
+                    // Sound ripples — only when there's real signal.
+                    if amp > 0.05 {
+                        ForEach(0..<3, id: \.self) { ring in
+                            let progress = ((t * 0.9 + Double(ring) / 3).truncatingRemainder(dividingBy: 1))
+                            Circle()
+                                .stroke(Color.accentColor.opacity((1 - progress) * Double(amp) * 0.5),
+                                        lineWidth: 2)
+                                .frame(width: h * (0.5 + progress * 1.6),
+                                       height: h * (0.5 + progress * 1.6))
+                        }
+                    }
+
+                    ZStack {
+                        // Faint full silhouette so the bird's outline is always read.
+                        Image(systemName: symbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: birdW, height: h)
+                            .foregroundStyle(Color.accentColor.opacity(0.18))
+
+                        // Green fill rising from the bottom, clipped to the bird shape.
+                        VStack(spacing: 0) {
+                            Spacer(minLength: 0)
+                            Rectangle()
+                                .fill(LinearGradient(
+                                    colors: [Color.accentColor, Color.accentColor.opacity(0.65)],
+                                    startPoint: .bottom, endPoint: .top))
+                                .frame(height: h * min(fillFraction, 1))
+                        }
+                        .frame(width: birdW, height: h)
+                        .mask(
+                            Image(systemName: symbol)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: birdW, height: h)
+                        )
+                    }
+                    .frame(width: birdW, height: h)
+                    .scaleEffect(1 + amp * 0.12, anchor: .center)
+                    .shadow(color: .accentColor.opacity(0.25 + Double(amp) * 0.4),
+                            radius: 4 + amp * 8)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.7), value: amp)
+                }
+                .frame(width: geo.size.width, height: h)
             }
         }
     }
+}
 
-    private func barHeight(for index: Int) -> CGFloat {
-        // Unprocessed (.measurement) capture has no AGC, so raw RMS is small.
-        // A sqrt curve keeps quiet bird song visible without saturating on voice.
-        let normalized = CGFloat(min(sqrt(max(level, 0)) * 4, 1.0))
-        let envelope = sin(.pi * Double(index) / Double(barCount - 1))
-        return 8 + 72 * normalized * CGFloat(envelope)
+// MARK: - AnalysisStatusView
+
+// Shows what the recognition pipeline is doing before a result is confirmed:
+// idle → listening → analyzing → narrowing in on a best guess.
+struct AnalysisStatusView: View {
+    let phase: AudioAnalyzer.Phase
+
+    var body: some View {
+        Group {
+            switch phase {
+            case .idle:
+                Text("Tap the button to start")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+            case .listening:
+                Label {
+                    Text("Listening for birds…")
+                } icon: {
+                    Image(systemName: "ear")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            case .analyzing:
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("Analyzing sound…")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+            case .thinking(let name, let confidence):
+                VStack(spacing: 4) {
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text("Possible:")
+                            .foregroundStyle(.secondary)
+                        Text(name)                                   // bird name (data)
+                            .fontWeight(.medium)
+                        Text(verbatim: "\(Int(confidence * 100))%")  // number, not localized
+                            .foregroundStyle(birdConfidenceColor(confidence))
+                            .monospacedDigit()
+                    }
+                    .font(.subheadline)
+                    Text("Listening to confirm…")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: phase)
     }
 }
 
@@ -210,8 +322,9 @@ struct DetectionCard: View {
 struct DetectionResults: View {
     let candidates: [BirdDetection]
 
-    // Tapping any candidate opens its detail sheet (info + Wikipedia link).
-    @State private var selectedBird: BirdDetection?
+    // Tapping any candidate opens its detail sheet (info + Wikipedia link). The
+    // selection is owned by ListenView so the sheet outlives the auto-clear.
+    @Binding var selectedBird: BirdDetection?
 
     var body: some View {
         VStack(spacing: 12) {
@@ -234,9 +347,6 @@ struct DetectionResults: View {
                     }
                 }
             }
-        }
-        .sheet(item: $selectedBird) { bird in
-            BirdDetailView(detection: bird)
         }
     }
 }

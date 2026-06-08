@@ -7,7 +7,14 @@
 "Birds" = "Birds";
 "Listening for birds…" = "Listening for birds…";
 "Tap the button to start" = "Tap the button to start";
+"Analyzing sound…" = "Analyzing sound…";
+"Possible:" = "Possible:";
+"Listening to confirm…" = "Listening to confirm…";
 "Mock mode — %@" = "Mock mode — %@";
+
+/* Siri / Shortcuts */
+"Identify a Bird" = "Identify a Bird";
+"Open the app and start listening to identify the birds around you." = "Open the app and start listening to identify the birds around you.";
 
 /* HistoryView */
 "No Detections Yet" = "No Detections Yet";

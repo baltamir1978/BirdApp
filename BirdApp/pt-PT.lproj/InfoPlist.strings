@@ -1,0 +1,3 @@
+CFBundleDisplayName = "Aves";
+NSMicrophoneUsageDescription = "Aves usa o microfone para ouvir e identificar as aves pelo seu canto.";
+NSLocationWhenInUseUsageDescription = "Aves usa a sua localização para limitar as deteções às aves da sua zona.";

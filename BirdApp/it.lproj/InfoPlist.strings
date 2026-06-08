@@ -1,0 +1,3 @@
+CFBundleDisplayName = "Uccelli";
+NSMicrophoneUsageDescription = "Uccelli usa il microfono per ascoltare e identificare gli uccelli dal loro canto.";
+NSLocationWhenInUseUsageDescription = "Uccelli usa la tua posizione per limitare i rilevamenti agli uccelli della tua zona.";

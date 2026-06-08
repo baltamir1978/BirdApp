@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("confidence_threshold") private var threshold: Double = 0.5
-    @AppStorage("detection_sensitivity") private var sensitivity: Double = 1.0
-    @AppStorage("temporal_smoothing") private var temporalSmoothing: Bool = true
-    @AppStorage("location_filter_influence") private var locationInfluence: Double = 1.0
-    @AppStorage("high_pass_filter") private var highPassFilter: Bool = true
+    @AppStorage("confidence_threshold") private var threshold: Double = 0.35
+    @AppStorage("detection_sensitivity") private var sensitivity: Double = 1.3
+    @AppStorage("temporal_smoothing") private var temporalSmoothing: Bool = false
+    @AppStorage("location_filter_influence") private var locationInfluence: Double = 0.7
+    @AppStorage("high_pass_filter") private var highPassFilter: Bool = false
     @AppStorage("high_pass_cutoff") private var highPassCutoff: Double = 200
-    @AppStorage("signal_gate") private var signalGate: Bool = true
+    @AppStorage("signal_gate") private var signalGate: Bool = false
     @AppStorage("clip_gate") private var clipGate: Bool = true
     @AppStorage("unprocessed_audio") private var unprocessedAudio: Bool = true
     @AppStorage("detection_display_seconds") private var displaySeconds: Double = 8

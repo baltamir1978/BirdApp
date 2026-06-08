@@ -1,0 +1,46 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Identify a bird with ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bestimme einen Vogel mit ${applicationName}" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Identifica un pájaro con ${applicationName}" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Identifier un oiseau avec ${applicationName}" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Identifica un uccello con ${applicationName}" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Identificar uma ave com ${applicationName}" } }
+      }
+    },
+    "Start listening with ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Starte das Zuhören mit ${applicationName}" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Empieza a escuchar con ${applicationName}" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Commencer l'écoute avec ${applicationName}" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Inizia ad ascoltare con ${applicationName}" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Começar a ouvir com ${applicationName}" } }
+      }
+    },
+    "What bird is this with ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Welcher Vogel ist das mit ${applicationName}" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Qué pájaro es este con ${applicationName}" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quel oiseau est-ce avec ${applicationName}" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Che uccello è questo con ${applicationName}" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Que ave é esta com ${applicationName}" } }
+      }
+    },
+    "Listen for birds with ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lausche Vögeln mit ${applicationName}" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escucha pájaros con ${applicationName}" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Écouter les oiseaux avec ${applicationName}" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ascolta gli uccelli con ${applicationName}" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Ouvir aves com ${applicationName}" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

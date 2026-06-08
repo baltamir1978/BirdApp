@@ -4,9 +4,22 @@ import Observation
 
 @Observable
 class AudioAnalyzer {
+    // What the recognition pipeline is currently doing, for the live UI indicator.
+    enum Phase: Equatable {
+        case idle                                   // not listening
+        case listening                              // listening, no qualifying sound yet
+        case analyzing                              // a window is going through the model
+        case thinking(name: String, confidence: Double)  // best guess, below threshold
+    }
+
     private(set) var isListening = false
     private(set) var audioLevel: Float = 0.0
+    private(set) var phase: Phase = .idle
     var errorMessage: String?
+
+    // Coalesce rapid phase events: an idle window shouldn't immediately wipe a
+    // "thinking" hint that's only a window old, or the label would flicker.
+    private var lastThinkingAt: Date = .distantPast
 
     // Emits the ranked candidate list (best first) for one detection event.
     var onDetections: (([BirdDetection]) -> Void)?
@@ -21,19 +34,50 @@ class AudioAnalyzer {
 
     // MARK: - Configuration
 
-    func configure(modelPath: String?, labelsPath: String?, weightsPath: String? = nil) {
+    func configure(modelPath: String?, labelsPath: String?, localizedLabelsPath: String? = nil, weightsPath: String? = nil) {
         birdNet.locationProvider = locationProvider
-        birdNet.setup(modelPath: modelPath, labelsPath: labelsPath, weightsPath: weightsPath)
+        birdNet.setup(modelPath: modelPath, labelsPath: labelsPath,
+                      localizedLabelsPath: localizedLabelsPath, weightsPath: weightsPath)
         birdNet.onDetections = { [weak self] candidates in
             guard let self else { return }
             let coord = self.locationProvider?()
-            let detections = candidates.map { c in
-                BirdDetection(commonName: c.common,
-                              scientificName: c.scientific,
-                              confidence: c.confidence,
-                              coordinate: coord)
+            let detections = candidates.map { c -> BirdDetection in
+                var d = BirdDetection(commonName: c.common,
+                                      scientificName: c.scientific,
+                                      confidence: c.confidence,
+                                      coordinate: coord)
+                d.localizedName = c.localized   // native common name from the localized labels
+                return d
             }
-            DispatchQueue.main.async { self.onDetections?(detections) }
+            DispatchQueue.main.async {
+                self.phase = .listening   // a confirmed result; the card takes over the UI
+                self.onDetections?(detections)
+            }
+        }
+
+        // Live pipeline feedback (all delivered on the analysis queue).
+        birdNet.onAnalyzing = { [weak self] in
+            DispatchQueue.main.async {
+                guard let self, self.isListening else { return }
+                self.phase = .analyzing
+            }
+        }
+        birdNet.onThinking = { [weak self] name, confidence in
+            DispatchQueue.main.async {
+                guard let self, self.isListening else { return }
+                self.lastThinkingAt = Date()
+                self.phase = .thinking(name: name, confidence: confidence)
+            }
+        }
+        birdNet.onIdleWindow = { [weak self] in
+            DispatchQueue.main.async {
+                guard let self, self.isListening else { return }
+                // Don't clobber a very recent "thinking" hint with a single quiet
+                // window — only fall back to plain listening once it's gone stale.
+                if Date().timeIntervalSince(self.lastThinkingAt) > 2.5 {
+                    self.phase = .listening
+                }
+            }
         }
     }
 
@@ -55,6 +99,7 @@ class AudioAnalyzer {
         try? AVAudioSession.sharedInstance().setActive(false)
         isListening = false
         audioLevel = 0
+        phase = .idle
     }
 
     // MARK: - Engine
@@ -96,6 +141,7 @@ class AudioAnalyzer {
         do {
             try engine.start()
             isListening = true
+            phase = .listening
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
