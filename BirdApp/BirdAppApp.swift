@@ -48,6 +48,15 @@ struct BirdAppApp: App {
             "unprocessed_audio": true,            // raw mic input (no system DSP)
             "detection_display_seconds": 8.0      // how long a result stays on screen
         ])
+
+        // Optional developer convenience: if DeveloperKeys.plist is bundled it
+        // seeds the xeno-canto key so it needn't be typed on every install. The
+        // file is gitignored and absent from release builds — then, as intended,
+        // each user supplies their own key in Settings. Registering it as a
+        // *default* means a key typed in Settings still wins.
+        if let key = XenoCantoService.bundledDeveloperKey {
+            UserDefaults.standard.register(defaults: [XenoCantoService.apiKeyDefaultsKey: key])
+        }
     }
 
     var body: some Scene {

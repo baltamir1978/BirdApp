@@ -22,3 +22,7 @@ Pods/
 build/
 *.o
 *.d
+
+# Local API keys — never commit. Optional: the app works without it, each user
+# enters their own xeno-canto key in Settings. Delete before publishing.
+BirdApp/DeveloperKeys.plist

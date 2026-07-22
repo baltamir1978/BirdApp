@@ -89,3 +89,28 @@
 
 /* AudioAnalyzer */
 "Microphone access denied. Enable it in Settings." = "Acesso ao microfone negado. Ative-o nas Definições.";
+
+/* PhotoView */
+"Photo" = "Foto";
+"Identify a bird from a photo" = "Identifica uma ave a partir de uma foto";
+"Works best when the bird fills a good part of the frame." = "Funciona melhor se a ave ocupar boa parte do enquadramento.";
+"Analysed area" = "Área analisada";
+"Analyzing photo…" = "A analisar a foto…";
+"No bird recognised in this photo" = "Nenhuma ave reconhecida nesta foto";
+"Camera" = "Câmara";
+"Choose photo" = "Escolher foto";
+"Could not read the photo" = "Não foi possível ler a foto";
+"Photo model not available" = "O modelo de fotos não está disponível";
+
+/* Cantos (xeno-canto) */
+"Bird Songs" = "Cantos";
+"API key" = "Chave API";
+"Get a free key at xeno-canto.org" = "Obtém uma chave gratuita em xeno-canto.org";
+"To play a species' song the app looks it up on xeno-canto, which needs a personal API key. Registering is free: create an account, confirm your email and copy the key from your account page. Recordings belong to their recordists and are credited when played." = "Para reproduzir o canto de uma espécie a app procura-o no xeno-canto, que exige uma chave API pessoal. Registar é gratuito: cria uma conta, confirma o email e copia a chave da página da tua conta. As gravações pertencem aos seus autores, que são creditados durante a reprodução.";
+"Hear its song" = "Ouvir o seu canto";
+"Loading song…" = "A carregar o canto…";
+"Stop" = "Parar";
+"Add your xeno-canto key in Settings to hear songs" = "Adiciona a tua chave xeno-canto nas definições para ouvir cantos";
+"No recording found for this species" = "Nenhuma gravação encontrada para esta espécie";
+"The xeno-canto key was rejected" = "A chave xeno-canto foi rejeitada";
+"xeno-canto (bird song archive)" = "xeno-canto (arquivo de cantos)";

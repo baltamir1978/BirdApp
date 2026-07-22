@@ -1,3 +1,4 @@
 CFBundleDisplayName = "Birds";
 NSMicrophoneUsageDescription = "Birds uses the microphone to listen for birds and identify them by their song.";
 NSLocationWhenInUseUsageDescription = "Birds uses your location to narrow detections to the birds expected in your area.";
+NSCameraUsageDescription = "Pájaros uses the camera so you can photograph a bird and identify it.";

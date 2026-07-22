@@ -154,7 +154,13 @@ struct DetectionRow: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(detection.displayName).font(.headline)
+                HStack(spacing: 6) {
+                    Text(detection.displayName).font(.headline)
+                    // How it was identified — song (default) or photo.
+                    Image(systemName: detection.source == .photo ? "camera.fill" : "waveform")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
                 Text(detection.scientificName)
                     .font(.caption).italic().foregroundStyle(.secondary)
                 if detection.coordinate != nil {

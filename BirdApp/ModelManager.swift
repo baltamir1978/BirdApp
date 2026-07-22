@@ -18,6 +18,7 @@ final class ModelManager {
     private(set) var statusMessage = NSLocalizedString("Initializing…", comment: "")
 
     private(set) var modelPath: String?
+    private(set) var photoModelPath: String?        // AIY Birds V1, para identificar por foto
     private(set) var labelsPath: String?
     private(set) var localizedLabelsPath: String?   // Common names in the device language, if bundled
     private(set) var weightsPath: String?
@@ -36,6 +37,11 @@ final class ModelManager {
         } else if let url = Bundle.main.url(forResource: "BirdNET_Classifier",
                                             withExtension: "mlpackage") {
             modelPath = url.path
+        }
+
+        if let url = Bundle.main.url(forResource: "BirdPhoto_Classifier", withExtension: "mlmodelc")
+                  ?? Bundle.main.url(forResource: "BirdPhoto_Classifier", withExtension: "mlpackage") {
+            photoModelPath = url.path
         }
 
         labelsPath = Bundle.main.path(forResource: "BirdNET_GLOBAL_6K_V2.4_Labels", ofType: "txt")

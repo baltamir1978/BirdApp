@@ -89,3 +89,28 @@
 
 /* AudioAnalyzer */
 "Microphone access denied. Enable it in Settings." = "Microphone access denied. Enable it in Settings.";
+
+/* PhotoView */
+"Photo" = "Photo";
+"Identify a bird from a photo" = "Identify a bird from a photo";
+"Works best when the bird fills a good part of the frame." = "Works best when the bird fills a good part of the frame.";
+"Analysed area" = "Analysed area";
+"Analyzing photo…" = "Analyzing photo…";
+"No bird recognised in this photo" = "No bird recognised in this photo";
+"Camera" = "Camera";
+"Choose photo" = "Choose photo";
+"Could not read the photo" = "Could not read the photo";
+"Photo model not available" = "Photo model not available";
+
+/* Cantos (xeno-canto) */
+"Bird Songs" = "Bird Songs";
+"API key" = "API key";
+"Get a free key at xeno-canto.org" = "Get a free key at xeno-canto.org";
+"To play a species' song the app looks it up on xeno-canto, which needs a personal API key. Registering is free: create an account, confirm your email and copy the key from your account page. Recordings belong to their recordists and are credited when played." = "To play a species' song the app looks it up on xeno-canto, which needs a personal API key. Registering is free: create an account, confirm your email and copy the key from your account page. Recordings belong to their recordists and are credited when played.";
+"Hear its song" = "Hear its song";
+"Loading song…" = "Loading song…";
+"Stop" = "Stop";
+"Add your xeno-canto key in Settings to hear songs" = "Add your xeno-canto key in Settings to hear songs";
+"No recording found for this species" = "No recording found for this species";
+"The xeno-canto key was rejected" = "The xeno-canto key was rejected";
+"xeno-canto (bird song archive)" = "xeno-canto (bird song archive)";

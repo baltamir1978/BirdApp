@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var store = DetectionStore()
     @State private var locationManager = LocationManager()
     @State private var modelManager = ModelManager()
+    @State private var photoIdentifier = PhotoIdentifier()
 
     @AppStorage("onboarding_done") private var onboardingDone = false
     @State private var showOnboarding = false
@@ -17,13 +18,17 @@ struct ContentView: View {
                 .tabItem { Label("Listen", systemImage: "mic.fill") }
                 .tag(0)
 
+            PhotoView(identifier: photoIdentifier, store: store)
+                .tabItem { Label("Photo", systemImage: "camera.fill") }
+                .tag(1)
+
             HistoryView(store: store)
                 .tabItem { Label("History", systemImage: "clock.fill") }
-                .tag(1)
+                .tag(2)
 
             SettingsView(modelManager: modelManager)
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
-                .tag(2)
+                .tag(3)
         }
         .onAppear {
             configure()
@@ -66,6 +71,14 @@ struct ContentView: View {
                            labelsPath: modelManager.labelsPath,
                            localizedLabelsPath: modelManager.localizedLabelsPath,
                            weightsPath: modelManager.weightsPath)
+
+        photoIdentifier.locationProvider = { [locationManager] in
+            locationManager.location?.coordinate
+        }
+        photoIdentifier.configure(modelPath: modelManager.photoModelPath,
+                                  labelsPath: modelManager.labelsPath,
+                                  localizedLabelsPath: modelManager.localizedLabelsPath,
+                                  weightsPath: modelManager.weightsPath)
 
         analyzer.onDetections = { [store] detections in
             Task { @MainActor in

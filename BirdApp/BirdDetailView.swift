@@ -30,6 +30,8 @@ struct BirdDetailView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
+                    SongPlayButton(scientificName: detection.scientificName)
+
                     if let url = articleURL {
                         Link(destination: url) {
                             Label("Read on Wikipedia", systemImage: "safari.fill")

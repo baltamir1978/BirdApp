@@ -437,6 +437,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Pájaros uses the camera so you can photograph a bird and identify it.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Pájaros uses the microphone to listen for birds and identify them by their song.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -473,6 +474,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Pájaros uses the camera so you can photograph a bird and identify it.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Pájaros uses the microphone to listen for birds and identify them by their song.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

@@ -11,6 +11,7 @@ struct SettingsView: View {
     @AppStorage("clip_gate") private var clipGate: Bool = true
     @AppStorage("unprocessed_audio") private var unprocessedAudio: Bool = true
     @AppStorage("detection_display_seconds") private var displaySeconds: Double = 8
+    @AppStorage(XenoCantoService.apiKeyDefaultsKey) private var xenoCantoKey: String = ""
     var modelManager: ModelManager
 
     var body: some View {
@@ -130,12 +131,32 @@ struct SettingsView: View {
                     Text("Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access.")
                 }
 
+                // MARK: Bird song playback
+                Section {
+                    HStack {
+                        Text("API key")
+                        Spacer()
+                        SecureField("xeno-canto", text: $xenoCantoKey)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .multilineTextAlignment(.trailing)
+                            .frame(maxWidth: 190)
+                    }
+                    Link("Get a free key at xeno-canto.org",
+                         destination: URL(string: "https://xeno-canto.org")!)
+                } header: {
+                    Text("Bird Songs")
+                } footer: {
+                    Text("To play a species' song the app looks it up on xeno-canto, which needs a personal API key. Registering is free: create an account, confirm your email and copy the key from your account page. Recordings belong to their recordists and are credited when played.")
+                }
+
                 // MARK: About
                 Section("About") {
                     LabeledContent { Text("6,000+ worldwide") } label: { Text("Species Coverage") }
                     LabeledContent { Text("On-device · offline") } label: { Text("Inference") }
                     Link("BirdNET Project", destination: URL(string: "https://birdnet.cornell.edu")!)
                     Link("whoBIRD (Android)", destination: URL(string: "https://github.com/woheller69/whoBIRD")!)
+                    Link("xeno-canto (bird song archive)", destination: URL(string: "https://xeno-canto.org")!)
                 }
             }
             .navigationTitle("Settings")

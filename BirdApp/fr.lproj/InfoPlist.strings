@@ -1,3 +1,4 @@
 CFBundleDisplayName = "Oiseaux";
 NSMicrophoneUsageDescription = "Oiseaux utilise le micro pour écouter et identifier les oiseaux à leur chant.";
 NSLocationWhenInUseUsageDescription = "Oiseaux utilise votre position pour limiter les détections aux oiseaux de votre région.";
+NSCameraUsageDescription = "Pájaros utilise l’appareil photo pour que vous puissiez photographier un oiseau et l’identifier.";
