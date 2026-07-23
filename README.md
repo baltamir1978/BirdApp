@@ -6,8 +6,10 @@ App de iOS que identifica aves **por su canto y por foto**, con todos los modelo
 
 - 🐦 **Identificación de aves por sonido** con el modelo [BirdNET](https://birdnet.cornell.edu/) (BirdNET_GLOBAL_6K_V2.4) ejecutado localmente vía **Core ML**.
 - 📷 **Identificación por foto** (pestaña *Foto*): elige una imagen o dispara con la cámara y la clasifica en el dispositivo. Usa [Google AIY Birds V1](https://www.kaggle.com/models/google/aiy) (MobileNetV2 entrenado con iNaturalist, 964 especies) convertido a Core ML, precedido de un recorte automático del ave con la saliencia de Vision. Los resultados se mapean a la taxonomía de BirdNET, así que reutilizan los nombres nativos y el filtro por ubicación.
-- 🔊 **Escuchar el canto** de la especie identificada, desde el archivo de [xeno-canto](https://xeno-canto.org) (requiere una clave API gratuita, ver abajo).
+- 🔊 **Escuchar el canto** de la especie identificada, desde el archivo de [xeno-canto](https://xeno-canto.org) (requiere una clave API gratuita, ver abajo). Disponible desde el resultado por foto, la ficha del ave **y cada fila del historial**.
 - 🎤 **Escucha en directo** desde el micrófono, con extracción de mel-espectrograma propia (`MelSpectrogramExtractor`, `filterbank1/2.bin`).
+- 🌙 **Escucha en segundo plano** (opt-in, `Ajustes → Segundo plano`): sigue identificando con la app minimizada o la pantalla bloqueada, con auto-apagado configurable para no drenar la batería. Sobrevive interrupciones (llamadas, Siri).
+- 🔗 **Fusión audio↔foto**: al identificar una foto, se da preferencia a las especies oídas por el micrófono en los últimos minutos (desempata candidatos parecidos sin inflar los porcentajes).
 - 📍 **Filtro por ubicación y temporada** (`LocationFilter`): pondera las especies probables según dónde y cuándo estás (influencia configurable).
 - 🌐 **Nombres comunes nativos** en muchos idiomas (archivos `BirdNET_GLOBAL_6K_V2.4_Labels_*.txt`).
 - 🖼️ **Ficha de cada ave** con imagen y descripción desde Wikipedia (`WikipediaImageService`).
@@ -36,8 +38,6 @@ O desde la línea de comandos:
 xcodebuild build -project BirdApp.xcodeproj -scheme BirdApp \
   -destination 'generic/platform=iOS Simulator'
 ```
-
-> El `Podfile` de la raíz es un vestigio de una versión anterior basada en TensorFlow Lite. **No lo uses**: no hay `Pods/` ni workspace, y ningún fichero Swift importa TensorFlowLite.
 
 ## Cantos de aves (xeno-canto)
 
@@ -76,8 +76,8 @@ BirdApp/
 │   ├── SettingsView.swift / BirdDetailView.swift
 │   └── BirdNET_*_Labels_*.txt     # Etiquetas en múltiples idiomas
 ├── BirdWidget/                    # Extensión de widgets
-├── Tools/                         # Scripts (add_widget_target.rb, convert_photo_model.py)
-├── Podfile
+├── Info.plist                     # Base fusionada con las claves generadas (UIBackgroundModes=audio)
+├── Tools/                         # Scripts (widget, modelos, tooling del clasificador ibérico)
 └── PrivacyInfo.xcprivacy          # Manifiesto de privacidad
 ```
 
@@ -117,6 +117,9 @@ Dos detalles no evidentes, documentados en el propio script: la salida del model
 | `signal_gate` | false | Descartar silencio / ruido grave |
 | `clip_gate` | true | Descartar audio saturado |
 | `unprocessed_audio` | true | Micrófono sin DSP del sistema |
+| `background_listening` | false | Seguir escuchando con la app minimizada (opt-in) |
+| `background_listening_minutes` | 30 | Auto-apagado de la escucha en segundo plano |
+| `audio_photo_fusion` | true | Favorecer en foto las especies oídas hace poco |
 
 ## Privacidad
 

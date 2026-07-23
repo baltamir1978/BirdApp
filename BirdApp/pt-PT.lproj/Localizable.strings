@@ -114,3 +114,23 @@
 "No recording found for this species" = "Nenhuma gravação encontrada para esta espécie";
 "The xeno-canto key was rejected" = "A chave xeno-canto foi rejeitada";
 "xeno-canto (bird song archive)" = "xeno-canto (arquivo de cantos)";
+
+/* Audio↔photo fusion */
+"Use Recent Songs" = "Usar cantos recentes";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you." = "Ao identificar uma foto, dá preferência às espécies ouvidas pelo microfone nos últimos minutos. Útil quando duas espécies são parecidas mas só uma está a cantar à tua volta.";
+"Its song was heard %@" = "O seu canto foi ouvido %@";
+
+/* Iberian photo model */
+"Photo Model" = "Modelo de foto";
+"Automatic" = "Automático";
+"Iberian" = "Ibérico";
+"Worldwide" = "Mundial";
+"Iberian model" = "Modelo ibérico";
+"Worldwide model" = "Modelo mundial";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you.\n\nThe Iberian model knows local birds far better but only those; automatic picks it when you are in Iberia and falls back to the worldwide one elsewhere." = "Ao identificar uma foto, dá preferência às espécies ouvidas pelo microfone nos últimos minutos. Útil quando duas espécies são parecidas mas só uma está a cantar à tua volta.\n\nO modelo ibérico conhece muito melhor as aves locais, mas apenas essas; o automático escolhe-o quando estás na península e recorre ao mundial noutros locais.";
+
+/* Background listening */
+"Keep Listening in Background" = "Continuar a ouvir em segundo plano";
+"Auto-stop After" = "Parar automaticamente após";
+"Background" = "Segundo plano";
+"Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here." = "Continua a identificar aves com a app em segundo plano ou o ecrã bloqueado. O microfone permanece ativo (o iOS mostra um ponto laranja) e gasta mais bateria, por isso a escuta para automaticamente após o tempo definido aqui.";

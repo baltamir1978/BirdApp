@@ -46,7 +46,10 @@ struct BirdAppApp: App {
             "signal_gate": false,                 // skip silence / low-band noise
             "clip_gate": true,                    // skip clipped audio
             "unprocessed_audio": true,            // raw mic input (no system DSP)
-            "detection_display_seconds": 8.0      // how long a result stays on screen
+            "detection_display_seconds": 8.0,     // how long a result stays on screen
+            PhotoIdentifier.fusionDefaultsKey: true, // let a recent song favour that species in a photo
+            "background_listening": false,        // keep listening when minimised (opt-in)
+            "background_listening_minutes": 30.0  // auto-stop after this long in the background
         ])
 
         // Optional developer convenience: if DeveloperKeys.plist is bundled it

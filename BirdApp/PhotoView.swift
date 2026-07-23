@@ -88,7 +88,8 @@ struct PhotoView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
 
-            // What the model actually looked at, once we know it.
+            // What the model actually looked at, once we know it — plus which
+            // classifier ran, so an odd result is at least explicable.
             if let crop = identifier.analysedImage {
                 HStack(spacing: 8) {
                     Image(uiImage: crop)
@@ -96,9 +97,15 @@ struct PhotoView: View {
                         .scaledToFill()
                         .frame(width: 44, height: 44)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                    Text("Analysed area")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Analysed area")
+                        if identifier.hasIberianModel {
+                            Text(identifier.usedIberianModel ? "Iberian model" : "Worldwide model")
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
             }
         }
@@ -121,6 +128,17 @@ struct PhotoView: View {
         case .done:
             VStack(spacing: 12) {
                 DetectionResults(candidates: identifier.candidates, selectedBird: $selectedBird)
+                // Say it out loud when a recent song is what tipped the ranking,
+                // rather than silently reordering behind the user's back.
+                if let hint = identifier.fusionHint {
+                    Label(String(format: NSLocalizedString("Its song was heard %@", comment: ""),
+                                 Self.relative.localizedString(for: hint.heardAt, relativeTo: .now)),
+                          systemImage: "waveform.badge.mic")
+                        .font(.caption)
+                        .foregroundStyle(Color.accentColor)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
                 if let top = identifier.candidates.first {
                     SongPlayButton(scientificName: top.scientificName)
                         .padding(.horizontal)
@@ -166,6 +184,8 @@ struct PhotoView: View {
     }
 
     // MARK: - Flow
+
+    private static let relative = RelativeDateTimeFormatter()
 
     private func load(_ item: PhotosPickerItem) async {
         loadError = nil

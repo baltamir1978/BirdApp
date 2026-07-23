@@ -32,6 +32,25 @@ class AudioAnalyzer {
     private let analysisQueue = DispatchQueue(label: "bird.analysis", qos: .userInitiated)
     private let targetSampleRate: Double = 48_000
 
+    // Interruption handling (phone calls, Siri, another audio app) so background
+    // listening survives them instead of dying silently.
+    private var interruptionObserver: NSObjectProtocol?
+    private var wasListeningBeforeInterruption = false
+    // Auto-stop timer for background listening, so a forgotten session doesn't
+    // drain the battery all night.
+    private var backgroundStopWorkItem: DispatchWorkItem?
+
+    init() {
+        interruptionObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] note in
+                self?.handleInterruption(note)
+            }
+    }
+
+    deinit {
+        if let interruptionObserver { NotificationCenter.default.removeObserver(interruptionObserver) }
+    }
+
     // MARK: - Configuration
 
     func configure(modelPath: String?, labelsPath: String?, localizedLabelsPath: String? = nil, weightsPath: String? = nil) {
@@ -94,12 +113,58 @@ class AudioAnalyzer {
     }
 
     func stopListening() {
+        cancelBackgroundStop()
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
         try? AVAudioSession.sharedInstance().setActive(false)
         isListening = false
         audioLevel = 0
         phase = .idle
+    }
+
+    // MARK: - Background listening
+
+    // Called when the app is backgrounded while listening and the user has opted
+    // in: keep the engine running but arm an auto-stop so it can't run forever.
+    func scheduleBackgroundStop(after seconds: TimeInterval) {
+        cancelBackgroundStop()
+        let item = DispatchWorkItem { [weak self] in self?.stopListening() }
+        backgroundStopWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: item)
+    }
+
+    func cancelBackgroundStop() {
+        backgroundStopWorkItem?.cancel()
+        backgroundStopWorkItem = nil
+    }
+
+    // MARK: - Interruptions
+
+    private func handleInterruption(_ note: Notification) {
+        guard let info = note.userInfo,
+              let raw = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+        switch type {
+        case .began:
+            // Something took the audio session (a call, Siri, another app).
+            if isListening {
+                wasListeningBeforeInterruption = true
+                engine.inputNode.removeTap(onBus: 0)
+                engine.stop()
+                isListening = false
+                phase = .idle
+            }
+        case .ended:
+            // Resume only if the system says we may and we were listening before.
+            let opts = (info[AVAudioSessionInterruptionOptionKey] as? UInt)
+                .map { AVAudioSession.InterruptionOptions(rawValue: $0) } ?? []
+            if wasListeningBeforeInterruption, opts.contains(.shouldResume) {
+                wasListeningBeforeInterruption = false
+                startEngine()
+            }
+        @unknown default:
+            break
+        }
     }
 
     // MARK: - Engine

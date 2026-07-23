@@ -9,6 +9,9 @@ struct ContentView: View {
     @State private var photoIdentifier = PhotoIdentifier()
 
     @AppStorage("onboarding_done") private var onboardingDone = false
+    @AppStorage("background_listening") private var backgroundListening = false
+    @AppStorage("background_listening_minutes") private var backgroundMinutes = 30.0
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showOnboarding = false
     @State private var selectedTab = 0
 
@@ -49,6 +52,24 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .stopBirdListening)) { _ in
             analyzer.stopListening()
         }
+        // Background listening policy: on minimising, keep the mic alive only if
+        // the user opted in and we're actually listening — and arm an auto-stop so
+        // a forgotten session can't drain the battery. Otherwise stop, as before.
+        // Returning to the foreground cancels any pending auto-stop.
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .background:
+                if backgroundListening, analyzer.isListening {
+                    analyzer.scheduleBackgroundStop(after: backgroundMinutes * 60)
+                } else {
+                    analyzer.stopListening()
+                }
+            case .active:
+                analyzer.cancelBackgroundStop()
+            default:
+                break
+            }
+        }
         // Keep the widgets' listening indicator in sync with the live state.
         .onChange(of: analyzer.isListening) { _, listening in
             BirdWidgetData.setListening(listening)
@@ -75,7 +96,23 @@ struct ContentView: View {
         photoIdentifier.locationProvider = { [locationManager] in
             locationManager.location?.coordinate
         }
+        // Audio↔photo fusion: hand the photo classifier whatever the microphone
+        // heard in the last few minutes. History is the source of truth here — it
+        // survives switching tabs, which is exactly the flow (hear it, find it,
+        // photograph it). A nil `source` is an audio entry saved before the photo
+        // tab existed.
+        photoIdentifier.recentlyHeardProvider = { [store] in
+            let cutoff = Date().addingTimeInterval(-PhotoIdentifier.fusionWindow)
+            var heard: [String: Date] = [:]
+            for detection in store.detections where detection.source != .photo && detection.date > cutoff {
+                let key = detection.scientificName.lowercased()
+                if let seen = heard[key], seen >= detection.date { continue }
+                heard[key] = detection.date
+            }
+            return heard
+        }
         photoIdentifier.configure(modelPath: modelManager.photoModelPath,
+                                  iberianModelPath: modelManager.iberianPhotoModelPath,
                                   labelsPath: modelManager.labelsPath,
                                   localizedLabelsPath: modelManager.localizedLabelsPath,
                                   weightsPath: modelManager.weightsPath)

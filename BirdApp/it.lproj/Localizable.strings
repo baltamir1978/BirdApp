@@ -114,3 +114,23 @@
 "No recording found for this species" = "Nessuna registrazione trovata per questa specie";
 "The xeno-canto key was rejected" = "La chiave xeno-canto è stata rifiutata";
 "xeno-canto (bird song archive)" = "xeno-canto (archivio di canti)";
+
+/* Audio↔photo fusion */
+"Use Recent Songs" = "Usa i canti recenti";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you." = "Nell'identificare una foto, privilegia le specie sentite dal microfono negli ultimi minuti. Utile quando due specie si somigliano ma solo una sta cantando intorno a te.";
+"Its song was heard %@" = "Il suo canto è stato sentito %@";
+
+/* Iberian photo model */
+"Photo Model" = "Modello foto";
+"Automatic" = "Automatico";
+"Iberian" = "Iberico";
+"Worldwide" = "Mondiale";
+"Iberian model" = "Modello iberico";
+"Worldwide model" = "Modello mondiale";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you.\n\nThe Iberian model knows local birds far better but only those; automatic picks it when you are in Iberia and falls back to the worldwide one elsewhere." = "Nell'identificare una foto, privilegia le specie sentite dal microfono negli ultimi minuti. Utile quando due specie si somigliano ma solo una sta cantando intorno a te.\n\nIl modello iberico conosce molto meglio gli uccelli locali, ma solo quelli; la modalità automatica lo sceglie quando sei nella penisola e passa al modello mondiale altrove.";
+
+/* Background listening */
+"Keep Listening in Background" = "Continua ad ascoltare in background";
+"Auto-stop After" = "Arresto automatico dopo";
+"Background" = "Background";
+"Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here." = "Continua a identificare gli uccelli mentre l'app è in background o lo schermo è bloccato. Il microfono resta attivo (iOS mostra un punto arancione) e consuma più batteria, quindi l'ascolto si interrompe automaticamente dopo il tempo impostato qui.";

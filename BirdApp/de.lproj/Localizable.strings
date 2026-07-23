@@ -114,3 +114,23 @@
 "No recording found for this species" = "Keine Aufnahme für diese Art gefunden";
 "The xeno-canto key was rejected" = "Der xeno-canto-Schlüssel wurde abgelehnt";
 "xeno-canto (bird song archive)" = "xeno-canto (Gesangsarchiv)";
+
+/* Audio↔photo fusion */
+"Use Recent Songs" = "Kürzliche Gesänge nutzen";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you." = "Bei der Bildbestimmung Arten bevorzugen, die in den letzten Minuten über das Mikrofon zu hören waren. Hilfreich, wenn zwei Arten ähnlich aussehen, aber nur eine in deiner Umgebung singt.";
+"Its song was heard %@" = "Ihr Gesang war %@ zu hören";
+
+/* Iberian photo model */
+"Photo Model" = "Fotomodell";
+"Automatic" = "Automatisch";
+"Iberian" = "Iberisch";
+"Worldwide" = "Weltweit";
+"Iberian model" = "Iberisches Modell";
+"Worldwide model" = "Weltweites Modell";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you.\n\nThe Iberian model knows local birds far better but only those; automatic picks it when you are in Iberia and falls back to the worldwide one elsewhere." = "Bei der Bildbestimmung Arten bevorzugen, die in den letzten Minuten über das Mikrofon zu hören waren. Hilfreich, wenn zwei Arten ähnlich aussehen, aber nur eine in deiner Umgebung singt.\n\nDas iberische Modell kennt heimische Vögel deutlich besser, aber eben nur diese; automatisch wählt es, wenn du auf der Halbinsel bist, und greift sonst auf das weltweite Modell zurück.";
+
+/* Background listening */
+"Keep Listening in Background" = "Im Hintergrund weiterhören";
+"Auto-stop After" = "Automatisch stoppen nach";
+"Background" = "Hintergrund";
+"Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here." = "Erkennt Vögel weiter, während die App im Hintergrund läuft oder der Bildschirm gesperrt ist. Das Mikrofon bleibt aktiv (iOS zeigt einen orangefarbenen Punkt) und verbraucht mehr Akku, daher stoppt das Zuhören automatisch nach der hier eingestellten Zeit.";

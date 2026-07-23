@@ -1,0 +1,390 @@
+6253	Turdus merula	Eurasian Blackbird	0.9987
+4245	Passer domesticus	House Sparrow	0.9954
+2176	Erithacus rubecula	European Robin	0.9908
+2802	Hirundo rustica	Barn Swallow	0.9892
+5782	Sturnus unicolor	Spotless Starling	0.9837
+5747	Streptopelia decaocto	Eurasian Collared-Dove	0.9815
+3666	Motacilla alba	White Wagtail	0.9808
+1579	Corvus corone	Carrion Crow	0.9783
+1491	Columba palumbus	Common Wood-Pigeon	0.9739
+2370	Fringilla coelebs	Common Chaffinch	0.9727
+423	Apus apus	Common Swift	0.9624
+4541	Phylloscopus collybita	Common Chiffchaff	0.9522
+4237	Parus major	Great Tit	0.9502
+5504	Serinus serinus	European Serin	0.9484
+994	Carduelis carduelis	European Goldfinch	0.9484
+1736	Curruca melanocephala	Sardinian Warbler	0.9467
+4482	Phoenicurus ochruros	Black Redstart	0.9350
+5801	Sylvia atricapilla	Eurasian Blackcap	0.9123
+1853	Delichon urbicum	Common House-Martin	0.9053
+1489	Columba livia	Rock Pigeon	0.9005
+4603	Pica pica	Eurasian Magpie	0.8846
+3105	Larus michahellis	Yellow-legged Gull	0.8822
+6186	Troglodytes troglodytes	Eurasian Wren	0.8808
+5378	Saxicola rubicola	European Stonechat	0.8797
+357	Anthus pratensis	Meadow Pipit	0.8732
+3307	Luscinia megarhynchos	Common Nightingale	0.8582
+1215	Chloris chloris	European Greenfinch	0.8526
+3529	Merops apiaster	European Bee-eater	0.8480
+2091	Emberiza calandra	Corn Bunting	0.8315
+2299	Falco tinnunculus	Eurasian Kestrel	0.8235
+4408	Phalacrocorax carbo	Great Cormorant	0.8185
+2628	Gyps fulvus	Eurasian Griffon	0.8076
+1315	Ciconia ciconia	White Stork	0.7994
+1745	Cyanistes caeruleus	Eurasian Blue Tit	0.7980
+3584	Milvus migrans	Black Kite	0.7967
+267	Anas platyrhynchos	Mallard	0.7899
+2401	Galerida cristata	Crested Lark	0.7825
+2312	Ficedula hypoleuca	European Pied Flycatcher	0.7663
+783	Buteo buteo	Common Buzzard	0.7590
+3098	Larus fuscus	Lesser Black-backed Gull	0.7506
+468	Ardea cinerea	Gray Heron	0.7422
+3685	Muscicapa striata	Spotted Flycatcher	0.7263
+6321	Upupa epops	Eurasian Hoopoe	0.7196
+3585	Milvus milvus	Red Kite	0.7196
+5783	Sturnus vulgaris	European Starling	0.7046
+1395	Cisticola juncidis	Zitting Cisticola	0.7020
+3226	Linaria cannabina	Eurasian Linnet	0.6996
+4587	Phylloscopus trochilus	Willow Warbler	0.6968
+1276	Chroicocephalus ridibundus	Black-headed Gull	0.6945
+1791	Cyanopica cooki	Iberian Magpie	0.6923
+2047	Egretta garzetta	Little Egret	0.6740
+1715	Cuculus canorus	Common Cuckoo	0.6717
+6265	Turdus philomelos	Song Thrush	0.6706
+1042	Cecropis daurica	Red-rumped Swallow	0.6703
+2442	Garrulus glandarius	Eurasian Jay	0.6671
+1129	Cettia cetti	Cetti's Warbler	0.6528
+2420	Gallinula chloropus	Eurasian Moorhen	0.6330
+2376	Fulica atra	Eurasian Coot	0.6081
+2900	Ichthyaetus audouinii	Audouin's Gull	0.5986
+2789	Himantopus himantopus	Black-winged Stilt	0.5985
+4552	Phylloscopus ibericus	Iberian Chiffchaff	0.5983
+428	Apus pallidus	Pallid Swift	0.5982
+82	Actitis hypoleucos	Common Sandpiper	0.5964
+750	Bubulcus ibis	Cattle Egret	0.5914
+3078	Lanius meridionalis	Iberian Gray Shrike	0.5910
+88	Aegithalos caudatus	Long-tailed Tit	0.5796
+1367	Circus aeruginosus	Eurasian Marsh-Harrier	0.5765
+4090	Oriolus oriolus	Eurasian Golden Oriole	0.5745
+5755	Streptopelia turtur	European Turtle-Dove	0.5409
+2780	Hieraaetus pennatus	Booted Eagle	0.5358
+3083	Lanius senator	Woodchat Shrike	0.5250
+3671	Motacilla flava	Western Yellow Wagtail	0.5128
+4636	Picus sharpei	Iberian Green Woodpecker	0.5059
+166	Alectoris rufa	Red-legged Partridge	0.5047
+4914	Prunella modularis	Dunnock	0.4855
+1113	Certhia brachydactyla	Short-toed Treecreeper	0.4721
+2796	Hippolais polyglotta	Melodious Warbler	0.4582
+3104	Larus marinus	Great Black-backed Gull	0.4489
+1577	Corvus corax	Common Raven	0.4457
+4472	Phoenicopterus roseus	Greater Flamingo	0.4412
+6364	Vanellus vanellus	Northern Lapwing	0.4400
+4038	Oenanthe oenanthe	Northern Wheatear	0.4359
+152	Alcedo atthis	Common Kingfisher	0.4327
+2194	Estrilda astrild	Common Waxbill	0.4300
+1592	Corvus monedula	Eurasian Jackdaw	0.4296
+5567	Sitta europaea	Eurasian Nuthatch	0.4278
+5867	Tachybaptus ruficollis	Little Grebe	0.4273
+4531	Phylloscopus bonelli	Western Bonelli's Warbler	0.4270
+5253	Regulus ignicapilla	Common Firecrest	0.4241
+5883	Tadorna tadorna	Common Shelduck	0.4206
+4331	Periparus ater	Coal Tit	0.4164
+2097	Emberiza cirlus	Cirl Bunting	0.4164
+4248	Passer hispaniolensis	Spanish Sparrow	0.4161
+1878	Dendrocopos major	Great Spotted Woodpecker	0.4103
+5591	Spatula clypeata	Northern Shoveler	0.4084
+3664	Morus bassanus	Northern Gannet	0.4058
+144	Alauda arvensis	Eurasian Skylark	0.4055
+6285	Turdus viscivorus	Mistle Thrush	0.4043
+5122	Ptyonoprogne rupestris	Eurasian Crag-Martin	0.4029
+3668	Motacilla cinerea	Gray Wagtail	0.3998
+3303	Lullula arborea	Wood Lark	0.3995
+1166	Charadrius dubius	Little Ringed Plover	0.3988
+2405	Galerida theklae	Thekla's Lark	0.3982
+1163	Charadrius alexandrinus	Kentish Plover	0.3756
+101	Aegypius monachus	Cinereous Vulture	0.3726
+4357	Petronia petronia	Rock Sparrow	0.3654
+853	Calidris alpina	Dunlin	0.3534
+261	Anas crecca	Green-winged Teal	0.3514
+4252	Passer montanus	Eurasian Tree Sparrow	0.3509
+6158	Tringa ochropus	Green Sandpiper	0.3498
+1168	Charadrius hiaticula	Common Ringed Plover	0.3497
+3070	Lanius collurio	Red-backed Shrike	0.3472
+4725	Plegadis falcinellus	Glossy Ibis	0.3452
+1747	Cyanistes teneriffae	African Blue Tit	0.3432
+2597	Grus grus	Common Crane	0.3358
+630	Aythya ferina	Common Pochard	0.3253
+771	Burhinus oedicnemus	Eurasian Thick-knee	0.3166
+69	Acrocephalus scirpaceus	Eurasian Reed Warbler	0.3133
+2112	Emberiza schoeniclus	Reed Bunting	0.3089
+467	Ardea alba	Great Egret	0.3040
+3764	Myiopsitta monachus	Monk Parakeet	0.3019
+5377	Saxicola rubetra	Whinchat	0.2989
+5980	Thalasseus sandvicensis	Sandwich Tern	0.2965
+2409	Gallinago gallinago	Common Snipe	0.2873
+3274	Lophophanes cristatus	Crested Tit	0.2872
+6162	Tringa totanus	Common Redshank	0.2835
+1366	Circaetus gallicus	Short-toed Snake-Eagle	0.2811
+5628	Spinus spinus	Eurasian Siskin	0.2783
+5251	Recurvirostra avosetta	Pied Avocet	0.2776
+5723	Sternula albifrons	Little Tern	0.2773
+4857	Porphyrio porphyrio	Western Swamphen	0.2773
+54	Acrocephalus arundinaceus	Great Reed Warbler	0.2753
+1739	Curruca undata	Dartford Warbler	0.2723
+31	Accipiter nisus	Eurasian Sparrowhawk	0.2670
+4639	Picus viridis	Eurasian Green Woodpecker	0.2666
+3476	Melanocorypha calandra	Calandra Lark	0.2653
+4702	Platalea leucorodia	Eurasian Spoonbill	0.2651
+1272	Chroicocephalus genei	Slender-billed Gull	0.2627
+3958	Numenius phaeopus	Whimbrel	0.2616
+6157	Tringa nebularia	Common Greenshank	0.2578
+2901	Ichthyaetus melanocephalus	Mediterranean Gull	0.2573
+2094	Emberiza cia	Rock Bunting	0.2557
+5176	Pyrrhocorax pyrrhocorax	Red-billed Chough	0.2506
+4483	Phoenicurus phoenicurus	Common Redstart	0.2487
+5325	Riparia riparia	Bank Swallow	0.2473
+1735	Curruca iberiae	Western Subalpine Warbler	0.2468
+569	Athene noctua	Little Owl	0.2462
+485	Arenaria interpres	Ruddy Turnstone	0.2462
+5134	Pycnonotus barbatus	Common Bulbul	0.2454
+852	Calidris alba	Sanderling	0.2369
+425	Apus melba	Alpine Swift	0.2364
+3968	Nycticorax nycticorax	Black-crowned Night-Heron	0.2328
+2456	Gelochelidon nilotica	Gull-billed Tern	0.2313
+473	Ardea purpurea	Purple Heron	0.2303
+863	Calidris minuta	Little Stint	0.2288
+3392	Mareca strepera	Gadwall	0.2283
+4340	Pernis apivorus	European Honey-buzzard	0.2276
+6243	Turdus iliacus	Redwing	0.2256
+890	Calonectris diomedea	Cory's Shearwater	0.2232
+4763	Podiceps cristatus	Great Crested Grebe	0.2231
+1730	Curruca communis	Greater Whitethroat	0.2227
+4767	Podiceps nigricollis	Eared Grebe	0.2224
+4211	Pandion haliaetus	Osprey	0.2207
+3089	Larus argentatus	Herring Gull	0.2141
+5214	Rallus aquaticus	Water Rail	0.2100
+307	Anser anser	Graylag Goose	0.2100
+366	Anthus trivialis	Tree Pipit	0.2089
+483	Ardeola ralloides	Squacco Heron	0.2072
+5716	Sterna hirundo	Common Tern	0.2056
+3955	Numenius arquata	Eurasian Curlew	0.2021
+2294	Falco peregrinus	Peregrine Falcon	0.2016
+1206	Chlidonias hybrida	Whiskered Tern	0.2012
+3900	Netta rufina	Red-crested Pochard	0.2008
+2293	Falco naumanni	Lesser Kestrel	0.1973
+3657	Monticola solitarius	Blue Rock-Thrush	0.1959
+3293	Loxia curvirostra	Red Crossbill	0.1887
+1803	Cygnus olor	Mute Swan	0.1887
+2510	Glareola pratincola	Collared Pratincole	0.1853
+363	Anthus spinoletta	Water Pipit	0.1815
+2933	Iduna opaca	Western Olivaceous Warbler	0.1814
+1374	Circus pygargus	Montagu's Harrier	0.1813
+1631	Coturnix coturnix	Common Quail	0.1800
+2643	Haematopus ostralegus	Eurasian Oystercatcher	0.1798
+1554	Coracias garrulus	European Roller	0.1795
+3225	Limosa limosa	Black-tailed Godwit	0.1792
+6153	Tringa glareola	Wood Sandpiper	0.1771
+3309	Luscinia svecica	Bluethroat	0.1755
+2977	Ixobrychus minutus	Little Bittern	0.1729
+430	Aquila adalberti	Spanish Eagle	0.1727
+2371	Fringilla montifringilla	Brambling	0.1705
+857	Calidris ferruginea	Curlew Sandpiper	0.1705
+1105	Cercotrichas galactotes	Rufous-tailed Scrub-Robin	0.1681
+2074	Elanus caeruleus	Black-winged Kite	0.1680
+5596	Spatula querquedula	Garganey	0.1675
+4035	Oenanthe leucura	Black Wheatear	0.1663
+258	Anas acuta	Northern Pintail	0.1654
+5182	Pyrrhula pyrrhula	Eurasian Bullfinch	0.1643
+866	Calidris pugnax	Ruff	0.1637
+2098	Emberiza citrinella	Yellowhammer	0.1612
+4755	Pluvialis squatarola	Black-bellied Plover	0.1611
+2995	Jynx torquilla	Eurasian Wryneck	0.1585
+995	Carduelis citrinella	Citril Finch	0.1572
+4154	Otus scops	Eurasian Scops-Owl	0.1566
+2298	Falco subbuteo	Eurasian Hobby	0.1541
+5976	Thalasseus bengalensis	Lesser Crested Tern	0.1537
+970	Caprimulgus europaeus	Eurasian Nightjar	0.1523
+3390	Mareca penelope	Eurasian Wigeon	0.1490
+339	Anthus campestris	Tawny Pipit	0.1482
+839	Calandrella brachydactyla	Greater Short-toed Lark	0.1456
+1435	Coccothraustes coccothraustes	Hawfinch	0.1432
+4578	Phylloscopus sibilatrix	Wood Warbler	0.1412
+2828	Hydroprogne caspia	Caspian Tern	0.1392
+4752	Pluvialis apricaria	European Golden-Plover	0.1389
+5803	Sylvia borin	Garden Warbler	0.1367
+5255	Regulus regulus	Goldcrest	0.1339
+1734	Curruca hortensis	Western Orphean Warbler	0.1331
+3250	Locustella luscinioides	Savi's Warbler	0.1326
+431	Aquila chrysaetos	Golden Eagle	0.1323
+6151	Tringa erythropus	Spotted Redshank	0.1302
+62	Acrocephalus melanopogon	Moustached Warbler	0.1296
+633	Aythya nyroca	Ferruginous Duck	0.1289
+1208	Chlidonias niger	Black Tern	0.1279
+4032	Oenanthe hispanica	Western Black-eared Wheatear	0.1266
+5016	Psittacula krameri	Rose-ringed Parakeet	0.1254
+1490	Columba oenas	Stock Dove	0.1231
+6315	Tyto alba	Barn Owl	0.1225
+1370	Circus cyaneus	Hen Harrier	0.1219
+4778	Poecile palustris	Marsh Tit	0.1215
+5711	Stercorarius skua	Great Skua	0.1213
+4912	Prunella collaris	Alpine Accentor	0.1211
+1316	Ciconia nigra	Black Stork	0.1209
+1413	Clamator glandarius	Great Spotted Cuckoo	0.1204
+68	Acrocephalus schoenobaenus	Sedge Warbler	0.1199
+981	Caprimulgus ruficollis	Red-necked Nightjar	0.1121
+2289	Falco columbarius	Merlin	0.1110
+3473	Melanitta nigra	Common Scoter	0.1084
+3224	Limosa lapponica	Bar-tailed Godwit	0.1076
+631	Aythya fuligula	Tufted Duck	0.1075
+5709	Stercorarius parasiticus	Parasitic Jaeger	0.1075
+2111	Emberiza sahari	House Bunting	0.1073
+872	Calidris temminckii	Temminck's Stint	0.1052
+149	Alaudala rufescens	Mediterranean Short-toed Lark	0.1028
+5936	Tchagra senegalus	Black-crowned Tchagra	0.1020
+1731	Curruca conspicillata	Spectacled Warbler	0.1010
+163	Alectoris barbara	Barbary Partridge	0.0994
+1997	Dryocopus martius	Black Woodpecker	0.0982
+6266	Turdus pilaris	Fieldfare	0.0966
+5127	Puffinus puffinus	Manx Shearwater	0.0952
+855	Calidris canutus	Red Knot	0.0947
+536	Asio otus	Long-eared Owl	0.0945
+1334	Cinclus cinclus	White-throated Dipper	0.0935
+5044	Pterocles orientalis	Black-bellied Sandgrouse	0.0911
+26	Accipiter gentilis	Northern Goshawk	0.0905
+2934	Iduna pallida	Eastern Olivaceous Warbler	0.0890
+6283	Turdus torquatus	Ring Ouzel	0.0885
+424	Apus caffer	White-rumped Swift	0.0856
+1207	Chlidonias leucopterus	White-winged Tern	0.0854
+2305	Ficedula albicollis	Collared Flycatcher	0.0853
+3074	Lanius excubitor	Great Gray Shrike	0.0840
+5121	Ptyonoprogne fuligula	Rock Martin	0.0838
+5424	Scolopax rusticola	Eurasian Woodcock	0.0828
+2824	Hydrobates pelagicus	European Storm-Petrel	0.0817
+5261	Remiz pendulinus	Eurasian Penduline-Tit	0.0816
+1985	Dryobates minor	Lesser Spotted Woodpecker	0.0815
+2449	Gavia immer	Common Loon	0.0812
+5041	Pterocles alchata	Pin-tailed Sandgrouse	0.0808
+3655	Monticola saxatilis	Rufous-tailed Rock-Thrush	0.0804
+4422	Phasianus colchicus	Ring-necked Pheasant	0.0798
+5710	Stercorarius pomarinus	Pomarine Jaeger	0.0796
+1195	Chersophilus duponti	Dupont's Lark	0.0791
+6161	Tringa stagnatilis	Marsh Sandpiper	0.0791
+2103	Emberiza hortulana	Ortolan Bunting	0.0788
+5175	Pyrrhocorax graculus	Yellow-billed Chough	0.0785
+2793	Hippolais icterina	Icterine Warbler	0.0784
+3537	Merops persicus	Blue-cheeked Bee-eater	0.0780
+422	Apus affinis	Little Swift	0.0765
+996	Carduelis corsicana	Corsican Finch	0.0728
+5033	Pternistis bicalcaratus	Double-spurred Francolin	0.0725
+1733	Curruca curruca	Lesser Whitethroat	0.0720
+5882	Tadorna ferruginea	Ruddy Shelduck	0.0717
+1598	Corvus ruficollis	Brown-necked Raven	0.0711
+5426	Scotocerca inquieta	Scrub Warbler	0.0709
+5753	Streptopelia senegalensis	Laughing Dove	0.0697
+3094	Larus canus	Common Gull	0.0697
+3315	Lymnocryptes minimus	Jack Snipe	0.0695
+4255	Passer simplex	Desert Sparrow	0.0695
+534	Asio flammeus	Short-eared Owl	0.0694
+151	Alca torda	Razorbill	0.0693
+5045	Pterocles senegallus	Spotted Sandgrouse	0.0692
+3254	Locustella naevia	Common Grasshopper-Warbler	0.0685
+4481	Phoenicurus moussieri	Moussier's Redstart	0.0677
+340	Anthus cervinus	Red-throated Pipit	0.0658
+6326	Uria aalge	Common Murre	0.0649
+5326	Rissa tridactyla	Black-legged Kittiwake	0.0647
+3527	Mergus serrator	Red-breasted Merganser	0.0646
+5324	Riparia paludicola	Plain Martin	0.0642
+5974	Tetrax tetrax	Little Bustard	0.0639
+1175	Charadrius morinellus	Eurasian Dotterel	0.0638
+2377	Fulica cristata	Red-knobbed Coot	0.0630
+232	Ammomanes cinctura	Bar-tailed Lark	0.0615
+751	Bucanetes githagineus	Trumpeter Finch	0.0603
+5760	Strix aluco	Tawny Owl	0.0595
+4860	Porzana porzana	Spotted Crake	0.0587
+4638	Picus vaillantii	Levaillant's Woodpecker	0.0583
+2380	Fulmarus glacialis	Northern Fulmar	0.0569
+356	Anthus petrosus	Rock Pipit	0.0568
+233	Ammomanes deserti	Desert Lark	0.0561
+143	Alaemon alaudipes	Greater Hoopoe-Lark	0.0559
+2172	Eremophila alpestris	Horned Lark	0.0548
+429	Apus unicolor	Plain Swift	0.0539
+726	Branta bernicla	Brant	0.0533
+632	Aythya marila	Greater Scaup	0.0523
+1418	Clangula hyemalis	Long-tailed Duck	0.0523
+2826	Hydrocoloeus minutus	Little Gull	0.0513
+2414	Gallinago media	Great Snipe	0.0488
+6056	Tichodroma muraria	Wallcreeper	0.0482
+1416	Clanga clanga	Greater Spotted Eagle	0.0476
+704	Botaurus stellaris	Great Bittern	0.0473
+3102	Larus hyperboreus	Glaucous Gull	0.0467
+629	Aythya collaris	Ring-necked Duck	0.0464
+4410	Phalaropus fulicarius	Red Phalarope	0.0456
+3526	Mergus merganser	Common Merganser	0.0453
+4034	Oenanthe leucopyga	White-crowned Wheatear	0.0437
+4765	Podiceps grisegena	Red-necked Grebe	0.0434
+743	Bubo bubo	Eurasian Eagle-Owl	0.0434
+2222	Euodice cantans	African Silverbill	0.0433
+478	Ardenna grisea	Sooty Shearwater	0.0429
+4411	Phalaropus lobatus	Red-necked Phalarope	0.0409
+6459	Zapornia parva	Little Crake	0.0405
+764	Bulweria bulwerii	Bulwer's Petrel	0.0398
+4029	Oenanthe deserti	Desert Wheatear	0.0396
+4762	Podiceps auritus	Horned Grebe	0.0390
+860	Calidris maritima	Purple Sandpiper	0.0381
+757	Bucephala clangula	Common Goldeneye	0.0378
+2497	Geronticus eremita	Northern Bald Ibis	0.0366
+1115	Certhia familiaris	Eurasian Treecreeper	0.0365
+1372	Circus macrourus	Pallid Harrier	0.0364
+3100	Larus glaucoides	Iceland Gull	0.0362
+5254	Regulus madeirensis	Madeira Firecrest	0.0356
+65	Acrocephalus paludicola	Aquatic Warbler	0.0354
+5578	Sitta whiteheadi	Corsican Nuthatch	0.0344
+4266	Pastor roseus	Rosy Starling	0.0343
+2448	Gavia arctica	Arctic Loon	0.0342
+2300	Falco vespertinus	Red-footed Falcon	0.0339
+6461	Zapornia pusilla	Baillon's Crake	0.0328
+2362	Fratercula arctica	Atlantic Puffin	0.0318
+5042	Pterocles exustus	Chestnut-bellied Sandgrouse	0.0315
+3388	Mareca americana	American Wigeon	0.0314
+1414	Clamator jacobinus	Pied Cuckoo	0.0307
+3014	Lagonosticta senegala	Red-billed Firefinch	0.0304
+337	Anthus berthelotii	Berthelot's Pipit	0.0302
+4249	Passer italiae	Italian Sparrow	0.0297
+4162	Oxyura jamaicensis	Ruddy Duck	0.0295
+1585	Corvus frugilegus	Rook	0.0288
+4028	Oena capensis	Namaqua Dove	0.0285
+1079	Cepphus grylle	Black Guillemot	0.0284
+66	Acrocephalus palustris	Marsh Warbler	0.0277
+56	Acrocephalus baeticatus	African Reed Warbler	0.0272
+139	Aix galericulata	Mandarin Duck	0.0261
+1798	Cygnus atratus	Black Swan	0.0258
+5593	Spatula discors	Blue-winged Teal	0.0256
+3525	Mergellus albellus	Smew	0.0251
+1881	Dendrocoptes medius	Middle Spotted Woodpecker	0.0248
+306	Anser albifrons	Greater White-fronted Goose	0.0223
+3135	Leiothrix lutea	Red-billed Leiothrix	0.0214
+1670	Crex crex	Corn Crake	0.0210
+1417	Clanga pomarina	Lesser Spotted Eagle	0.0194
+4723	Plectrophenax nivalis	Snow Bunting	0.0190
+862	Calidris melanotos	Pectoral Sandpiper	0.0188
+1578	Corvus cornix	Hooded Crow	0.0186
+1800	Cygnus columbianus	Tundra Swan	0.0185
+5519	Setophaga coronata	Yellow-rumped Warbler	0.0185
+308	Anser brachyrhynchus	Pink-footed Goose	0.0183
+2223	Euodice malabarica	Indian Silverbill	0.0182
+4033	Oenanthe isabellina	Isabelline Wheatear	0.0172
+3659	Montifringilla nivalis	White-winged Snowfinch	0.0166
+2451	Gavia stellata	Red-throated Loon	0.0164
+4769	Podilymbus podiceps	Pied-billed Grebe	0.0157
+5588	Somateria mollissima	Common Eider	0.0153
+627	Aythya affinis	Lesser Scaup	0.0151
+729	Branta leucopsis	Barnacle Goose	0.0142
+3096	Larus delawarensis	Ring-billed Gull	0.0141
+2408	Gallinago delicata	Wilson's Snipe	0.0130
+4321	Perdix perdix	Gray Partridge	0.0125
+2821	Hydrobates castro	Band-rumped Storm-Petrel	0.0114
+856	Calidris falcinellus	Broad-billed Sandpiper	0.0113
+4554	Phylloscopus inornatus	Yellow-browed Warbler	0.0111
+1876	Dendrocopos leucotos	White-backed Woodpecker	0.0107
+1801	Cygnus cygnus	Whooper Swan	0.0106
+867	Calidris pusilla	Semipalmated Sandpiper	0.0105

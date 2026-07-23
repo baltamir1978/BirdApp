@@ -11,6 +11,11 @@ struct SettingsView: View {
     @AppStorage("clip_gate") private var clipGate: Bool = true
     @AppStorage("unprocessed_audio") private var unprocessedAudio: Bool = true
     @AppStorage("detection_display_seconds") private var displaySeconds: Double = 8
+    @AppStorage("background_listening") private var backgroundListening: Bool = false
+    @AppStorage("background_listening_minutes") private var backgroundMinutes: Double = 30
+    @AppStorage(PhotoIdentifier.fusionDefaultsKey) private var audioPhotoFusion: Bool = true
+    @AppStorage(PhotoIdentifier.modelPreferenceKey) private var photoModel: String =
+        PhotoIdentifier.ModelChoice.automatic.rawValue
     @AppStorage(XenoCantoService.apiKeyDefaultsKey) private var xenoCantoKey: String = ""
     var modelManager: ModelManager
 
@@ -110,6 +115,28 @@ struct SettingsView: View {
                     Text("Unprocessed audio disables the system's automatic gain, noise suppression and echo cancellation, which distort bird song. The high-pass filter attenuates low-frequency noise (traffic, wind, mains hum) below the cutoff. Turn any of these off if detection gets worse in your environment.")
                 }
 
+                // MARK: Background listening
+                Section {
+                    Toggle("Keep Listening in Background", isOn: $backgroundListening)
+                    if backgroundListening {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Auto-stop After")
+                                Spacer()
+                                Text("\(Int(backgroundMinutes)) min")
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                            }
+                            Slider(value: $backgroundMinutes, in: 5...120, step: 5)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                } header: {
+                    Text("Background")
+                } footer: {
+                    Text("Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here.")
+                }
+
                 // MARK: Location
                 Section {
                     VStack(alignment: .leading, spacing: 6) {
@@ -129,6 +156,23 @@ struct SettingsView: View {
                     Text("Location")
                 } footer: {
                     Text("Weights detections toward species expected in your region at this time of year, instead of excluding the rest outright. Higher = stronger preference for local birds; 0% disables it. Needs location access.")
+                }
+
+                // MARK: Photo
+                Section {
+                    Toggle("Use Recent Songs", isOn: $audioPhotoFusion)
+                    // Only worth offering when both classifiers are on board.
+                    if modelManager.iberianPhotoModelPath != nil {
+                        Picker("Photo Model", selection: $photoModel) {
+                            Text("Automatic").tag(PhotoIdentifier.ModelChoice.automatic.rawValue)
+                            Text("Iberian").tag(PhotoIdentifier.ModelChoice.iberian.rawValue)
+                            Text("Worldwide").tag(PhotoIdentifier.ModelChoice.worldwide.rawValue)
+                        }
+                    }
+                } header: {
+                    Text("Photo")
+                } footer: {
+                    Text("When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you.\n\nThe Iberian model knows local birds far better but only those; automatic picks it when you are in Iberia and falls back to the worldwide one elsewhere.")
                 }
 
                 // MARK: Bird song playback

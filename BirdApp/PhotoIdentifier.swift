@@ -27,15 +27,32 @@ final class PhotoIdentifier {
         case failed(String)
     }
 
+    // Set when the winning candidate owes its place to having been heard singing
+    // a moment ago, so the UI can say so instead of silently reordering.
+    struct FusionHint: Equatable {
+        let scientificName: String
+        let heardAt: Date
+    }
+
     private(set) var phase: Phase = .idle
     private(set) var candidates: [BirdDetection] = []
     // The square crop actually fed to the model — shown in the UI so the user can
     // see what was analysed (and reframe if it grabbed the wrong thing).
     private(set) var analysedImage: UIImage?
+    private(set) var fusionHint: FusionHint?
+    // Which classifier produced the current result, for the UI to disclose.
+    private(set) var usedIberianModel = false
 
     var locationProvider: (() -> CLLocationCoordinate2D?)?
 
-    private var visionModel: VNCoreMLModel?
+    // Audio↔photo fusion: which species the microphone picked up recently
+    // (lowercased scientific name → when it was last heard). A bird that was
+    // singing here a minute ago is a much better bet than a visually similar
+    // species from another continent, and both signals live in this same process.
+    var recentlyHeardProvider: (() -> [String: Date])?
+
+    private var visionModel: VNCoreMLModel?          // AIY Birds V1, worldwide
+    private var iberianModel: VNCoreMLModel?         // Create ML, ~390 Iberian species
     private var locationFilter: LocationFilter?
 
     // Parallel to the model's class labels; nil where a species has no BirdNET
@@ -47,11 +64,13 @@ final class PhotoIdentifier {
     private let backgroundLabel = "__background__"
     private let maxCandidates = 3
 
-    var isReady: Bool { visionModel != nil }
+    var isReady: Bool { visionModel != nil || iberianModel != nil }
+    var hasIberianModel: Bool { iberianModel != nil }
 
     // MARK: - Setup
 
     func configure(modelPath: String?,
+                   iberianModelPath: String? = nil,
                    labelsPath: String?,
                    localizedLabelsPath: String?,
                    weightsPath: String?) {
@@ -82,21 +101,67 @@ final class PhotoIdentifier {
             locationFilter = LocationFilter(weightsPath: weightsPath)
         }
 
-        guard let modelPath else { return }
+        visionModel = Self.loadModel(at: modelPath)
+        iberianModel = Self.loadModel(at: iberianModelPath)
+    }
+
+    private static func loadModel(at path: String?) -> VNCoreMLModel? {
+        guard let path else { return nil }
         do {
             let config = MLModelConfiguration()
             config.computeUnits = .all
-            let ml = try MLModel(contentsOf: URL(fileURLWithPath: modelPath), configuration: config)
-            visionModel = try VNCoreMLModel(for: ml)
+            let ml = try MLModel(contentsOf: URL(fileURLWithPath: path), configuration: config)
+            return try VNCoreMLModel(for: ml)
         } catch {
-            print("[PhotoIdentifier] CoreML load failed: \(error)")
+            print("[PhotoIdentifier] CoreML load failed for \(path): \(error)")
+            return nil
         }
+    }
+
+    // MARK: - Model choice
+
+    // Which classifier to run. The Iberian one knows ~390 species in far more
+    // depth; the worldwide one knows 964 and is the only sensible choice abroad.
+    enum ModelChoice: String {
+        case automatic, iberian, worldwide
+    }
+
+    static let modelPreferenceKey = "photo_model_preference"
+
+    // Rough bounding box over Iberia and the Balearics. Deliberately coarse: the
+    // avifauna does not change at the border, so a few kilometres of southern
+    // France or northern Morocco picking the Iberian model is the right answer
+    // anyway. Without a fix we stay worldwide, which is the safe default.
+    private static func isIberian(_ coordinate: CLLocationCoordinate2D?) -> Bool {
+        guard let coordinate else { return false }
+        return (35.9...44.4).contains(coordinate.latitude)
+            && (-9.8...4.4).contains(coordinate.longitude)
+    }
+
+    private func model(for coordinate: CLLocationCoordinate2D?) -> (VNCoreMLModel, Bool)? {
+        let preference = ModelChoice(
+            rawValue: UserDefaults.standard.string(forKey: Self.modelPreferenceKey) ?? "") ?? .automatic
+
+        switch preference {
+        case .iberian:
+            if let iberianModel { return (iberianModel, true) }
+        case .worldwide:
+            break
+        case .automatic:
+            if let iberianModel, Self.isIberian(coordinate) { return (iberianModel, true) }
+        }
+        // Fall back to the worldwide model — also the path taken when the Iberian
+        // model was never bundled. If only the Iberian one is present, use it
+        // rather than refusing to identify anything.
+        if let visionModel { return (visionModel, false) }
+        return iberianModel.map { ($0, true) }
     }
 
     // MARK: - Identification
 
     func identify(_ image: UIImage) async {
-        guard let visionModel else {
+        let coordinate = locationProvider?()
+        guard let (activeModel, iberian) = model(for: coordinate) else {
             phase = .failed(NSLocalizedString("Photo model not available", comment: ""))
             return
         }
@@ -108,14 +173,15 @@ final class PhotoIdentifier {
 
         phase = .working
         candidates = []
+        fusionHint = nil
+        usedIberianModel = iberian
 
         let orientation = Self.cgOrientation(image.imageOrientation)
-        let coordinate = locationProvider?()
 
         // Vision work is not cheap — keep it off the main actor.
-        let outcome = await Task.detached(priority: .userInitiated) { [maxCandidates, backgroundLabel] in
+        let outcome = await Task.detached(priority: .userInitiated) { [backgroundLabel] in
             let cropped = Self.cropToSubject(cgImage, orientation: orientation)
-            let request = VNCoreMLRequest(model: visionModel)
+            let request = VNCoreMLRequest(model: activeModel)
             request.imageCropAndScaleOption = .centerCrop
 
             let handler = VNImageRequestHandler(cgImage: cropped, options: [:])
@@ -127,14 +193,25 @@ final class PhotoIdentifier {
             guard let observations = request.results as? [VNClassificationObservation] else {
                 return Outcome(error: nil, crop: cropped)
             }
+            // Keep a deeper slice than we will ever show: the location filter and
+            // the audio prior re-rank this pool, and a species the user just heard
+            // is worth rescuing from 8th place. Trimmed back to `maxCandidates`
+            // once the re-ranking is done.
             let ranked = observations
                 .sorted { $0.confidence > $1.confidence }
-                .prefix(maxCandidates + 1)
+                .prefix(Self.rerankPool)
                 .map { (identifier: $0.identifier, confidence: Double($0.confidence)) }
             let isBackground = ranked.first?.identifier == backgroundLabel
+            // Underscores are stripped only after `__background__` has been
+            // filtered out — normalising first would mangle it into "  background  "
+            // and the "no bird here" answer would never fire. The Iberian model's
+            // classes are directory names ("Turdus_merula"); AIY uses spaces.
             return Outcome(error: nil,
                            crop: cropped,
-                           ranked: ranked.filter { $0.identifier != backgroundLabel },
+                           ranked: ranked
+                               .filter { $0.identifier != backgroundLabel }
+                               .map { (identifier: $0.identifier.replacingOccurrences(of: "_", with: " "),
+                                       confidence: $0.confidence) },
                            background: isBackground)
         }.value
 
@@ -176,6 +253,7 @@ final class PhotoIdentifier {
         phase = .idle
         candidates = []
         analysedImage = nil
+        fusionHint = nil
     }
 
     private struct Outcome: Sendable {
@@ -220,7 +298,13 @@ final class PhotoIdentifier {
             return detection
         }
 
+        let boosted = applyAudioPrior(to: &results)
         results.sort { $0.confidence > $1.confidence }
+
+        // Only flag the fusion when it actually decided the answer.
+        if let top = results.first, let heardAt = boosted[top.scientificName.lowercased()] {
+            fusionHint = FusionHint(scientificName: top.scientificName, heardAt: heardAt)
+        }
 
         // Drop the tail: with 965 classes the runners-up are usually well under
         // 1 %, and listing them as "other possibilities · 0 %" reads as a bug.
@@ -229,6 +313,47 @@ final class PhotoIdentifier {
         let alternatives = results.dropFirst().filter { $0.confidence >= Self.minimumAlternative }
         return Array(([results.first].compactMap { $0 } + alternatives).prefix(maxCandidates))
     }
+
+    // Raise the prior of candidates the microphone heard recently, weighted by how
+    // long ago (full strength just now, fading to nothing at `fusionWindow`).
+    //
+    // The scores are renormalised afterwards so the pool keeps the same total
+    // belief it had: the prior *redistributes* confidence between candidates
+    // rather than manufacturing it, which keeps the percentages on screen honest.
+    // Returns the species that were boosted, so the caller can explain the result.
+    @discardableResult
+    private func applyAudioPrior(to results: inout [BirdDetection]) -> [String: Date] {
+        guard UserDefaults.standard.bool(forKey: Self.fusionDefaultsKey),
+              let heard = recentlyHeardProvider?(), !heard.isEmpty,
+              results.count > 1                      // nothing to out-rank
+        else { return [:] }
+
+        let now = Date()
+        let before = results.reduce(0) { $0 + $1.confidence }
+        var boosted: [String: Date] = [:]
+
+        for i in results.indices {
+            let key = results[i].scientificName.lowercased()
+            guard let heardAt = heard[key] else { continue }
+            let age = now.timeIntervalSince(heardAt)
+            guard age >= 0, age < Self.fusionWindow else { continue }
+            results[i].confidence *= 1 + Self.fusionBoost * (1 - age / Self.fusionWindow)
+            boosted[key] = heardAt
+        }
+
+        let after = results.reduce(0) { $0 + $1.confidence }
+        guard !boosted.isEmpty, after > 0 else { return [:] }
+        for i in results.indices { results[i].confidence *= before / after }
+        return boosted
+    }
+
+    static let fusionDefaultsKey = "audio_photo_fusion"
+    // How long a song keeps vouching for a species, matched to the history
+    // de-duplication window so one sighting is one event across both tabs.
+    static let fusionWindow: TimeInterval = 600
+    // Strength at age zero: a species heard seconds ago doubles its score.
+    private static let fusionBoost = 1.0
+    private static let rerankPool = 10
 
     // Confidence floors: below `minimumTop` we claim nothing rather than show a
     // near-random species; alternatives need more than noise to be worth listing.

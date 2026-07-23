@@ -169,3 +169,47 @@ struct SongPlayButton: View {
             : NSLocalizedString("Hear its song", comment: "")
     }
 }
+
+// MARK: - SongPlayIconButton
+
+// Icon-only variant for tight spots such as a history row, where there is no
+// room for the recordist credit — that stays on the detail screen, which is one
+// tap away. Hidden entirely without a xeno-canto key, since it could do nothing.
+struct SongPlayIconButton: View {
+    let scientificName: String
+
+    @State private var player = BirdSongPlayer.shared
+    @AppStorage(XenoCantoService.apiKeyDefaultsKey) private var apiKey: String = ""
+
+    private var isMine: Bool { player.scientificName == scientificName }
+    private var isLoading: Bool { isMine && player.state == .loading }
+
+    var body: some View {
+        if !apiKey.isEmpty {
+            Button {
+                Task { await player.toggle(scientificName: scientificName) }
+            } label: {
+                Image(systemName: iconName)
+                    .font(.body)
+                    .foregroundStyle(tint)
+                    .frame(width: 40, height: 40)
+                    .contentShape(Rectangle())
+            }
+            // Otherwise the whole row's NavigationLink would swallow the tap.
+            .buttonStyle(.borderless)
+            .disabled(isLoading)
+            .accessibilityLabel(player.isPlaying(scientificName) ? Text("Stop") : Text("Hear its song"))
+        }
+    }
+
+    private var iconName: String {
+        if isLoading { return "hourglass" }
+        if isMine, case .failed = player.state { return "speaker.slash.fill" }
+        return player.isPlaying(scientificName) ? "stop.circle.fill" : "speaker.wave.2.fill"
+    }
+
+    private var tint: Color {
+        if isMine, case .failed = player.state { return .orange }
+        return .accentColor
+    }
+}

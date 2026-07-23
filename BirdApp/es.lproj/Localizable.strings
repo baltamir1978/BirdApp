@@ -114,3 +114,23 @@
 "No recording found for this species" = "No hay ninguna grabación de esta especie";
 "The xeno-canto key was rejected" = "xeno-canto ha rechazado la clave";
 "xeno-canto (bird song archive)" = "xeno-canto (archivo de cantos)";
+
+/* Audio↔photo fusion */
+"Use Recent Songs" = "Usar cantos recientes";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you." = "Al identificar una foto, da preferencia a las especies oídas por el micrófono en los últimos minutos. Útil cuando dos especies se parecen pero solo una está cantando a tu alrededor.";
+"Its song was heard %@" = "Su canto se oyó %@";
+
+/* Iberian photo model */
+"Photo Model" = "Modelo de foto";
+"Automatic" = "Automático";
+"Iberian" = "Ibérico";
+"Worldwide" = "Mundial";
+"Iberian model" = "Modelo ibérico";
+"Worldwide model" = "Modelo mundial";
+"When identifying a photo, favour species heard through the microphone in the last few minutes. Useful when two species look alike but only one is singing around you.\n\nThe Iberian model knows local birds far better but only those; automatic picks it when you are in Iberia and falls back to the worldwide one elsewhere." = "Al identificar una foto, da preferencia a las especies oídas por el micrófono en los últimos minutos. Útil cuando dos especies se parecen pero solo una está cantando a tu alrededor.\n\nEl modelo ibérico conoce mucho mejor las aves locales, pero solo esas; el automático lo usa cuando estás en la península y recurre al mundial en cualquier otro sitio.";
+
+/* Background listening */
+"Keep Listening in Background" = "Seguir escuchando en segundo plano";
+"Auto-stop After" = "Apagar tras";
+"Background" = "Segundo plano";
+"Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here." = "Sigue identificando aves con la app en segundo plano o la pantalla bloqueada. El micrófono permanece activo (iOS muestra un punto naranja) y gasta más batería, así que la escucha se detiene automáticamente tras el tiempo indicado aquí.";

@@ -19,6 +19,9 @@ final class ModelManager {
 
     private(set) var modelPath: String?
     private(set) var photoModelPath: String?        // AIY Birds V1, para identificar por foto
+    // Iberian photo classifier (Create ML, ~390 species). Optional: when it is
+    // not bundled the app simply keeps using the worldwide model everywhere.
+    private(set) var iberianPhotoModelPath: String?
     private(set) var labelsPath: String?
     private(set) var localizedLabelsPath: String?   // Common names in the device language, if bundled
     private(set) var weightsPath: String?
@@ -42,6 +45,11 @@ final class ModelManager {
         if let url = Bundle.main.url(forResource: "BirdPhoto_Classifier", withExtension: "mlmodelc")
                   ?? Bundle.main.url(forResource: "BirdPhoto_Classifier", withExtension: "mlpackage") {
             photoModelPath = url.path
+        }
+
+        if let url = Bundle.main.url(forResource: "BirdPhoto_Iberian", withExtension: "mlmodelc")
+                  ?? Bundle.main.url(forResource: "BirdPhoto_Iberian", withExtension: "mlpackage") {
+            iberianPhotoModelPath = url.path
         }
 
         labelsPath = Bundle.main.path(forResource: "BirdNET_GLOBAL_6K_V2.4_Labels", ofType: "txt")

@@ -172,6 +172,9 @@ struct DetectionRow: View {
 
             Spacer()
 
+            // Hear the species' song without leaving the list.
+            SongPlayIconButton(scientificName: detection.scientificName)
+
             VStack(alignment: .trailing, spacing: 2) {
                 Text("\(Int(detection.confidence * 100))%")
                     .font(.headline.monospacedDigit())
@@ -213,6 +216,9 @@ struct DetectionDetailView: View {
                     Text(detection.displayName).font(.title.bold())
                     Text(detection.scientificName).font(.title3).italic().foregroundStyle(.secondary)
                 }
+
+                SongPlayButton(scientificName: detection.scientificName)
+                    .padding(.horizontal)
 
                 // Wikipedia summary + link (in the app language, English fallback)
                 if isLoadingArticle {
