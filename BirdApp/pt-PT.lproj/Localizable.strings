@@ -134,3 +134,14 @@
 "Auto-stop After" = "Parar automaticamente após";
 "Background" = "Segundo plano";
 "Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here." = "Continua a identificar aves com a app em segundo plano ou o ecrã bloqueado. O microfone permanece ativo (o iOS mostra um ponto laranja) e gasta mais bateria, por isso a escuta para automaticamente após o tempo definido aqui.";
+
+/* Photo framing */
+"Frame the bird" = "Enquadre a ave";
+"Identify" = "Identificar";
+"Whole photo" = "Foto inteira";
+"Looking for the subject…" = "A procurar o motivo…";
+"Drag a box around the bird" = "Arraste um retângulo à volta da ave";
+"Tap the bird, or drag a box around it" = "Toque na ave ou arraste um retângulo à volta";
+"Drag to move, corners to resize" = "Arraste para mover; os cantos para redimensionar";
+"Selected area" = "Área selecionada";
+"Adjust" = "Ajustar";

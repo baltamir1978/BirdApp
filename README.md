@@ -5,7 +5,8 @@ App de iOS que identifica aves **por su canto y por foto**, con todos los modelo
 ## Características
 
 - 🐦 **Identificación de aves por sonido** con el modelo [BirdNET](https://birdnet.cornell.edu/) (BirdNET_GLOBAL_6K_V2.4) ejecutado localmente vía **Core ML**.
-- 📷 **Identificación por foto** (pestaña *Foto*): elige una imagen o dispara con la cámara y la clasifica en el dispositivo. Usa [Google AIY Birds V1](https://www.kaggle.com/models/google/aiy) (MobileNetV2 entrenado con iNaturalist, 964 especies) convertido a Core ML, precedido de un recorte automático del ave con la saliencia de Vision. Los resultados se mapean a la taxonomía de BirdNET, así que reutilizan los nombres nativos y el filtro por ubicación.
+- 📷 **Identificación por foto** (pestaña *Foto*): elige una imagen o dispara con la cámara y la clasifica en el dispositivo. Usa [Google AIY Birds V1](https://www.kaggle.com/models/google/aiy) (MobileNetV2 entrenado con iNaturalist, 964 especies) convertido a Core ML. Los resultados se mapean a la taxonomía de BirdNET, así que reutilizan los nombres nativos y el filtro por ubicación.
+- ✂️ **Encuadre manual del ave**: toda foto —de la cámara o de la galería— pasa por una pantalla donde decides qué mirar. Un toque sobre el pájaro lo selecciona (segmentación de sujetos de Vision, el mismo motor del «levantar sujeto del fondo» de iOS), o arrastras un recuadro a mano; también puedes dejar el recorte automático por saliencia. Desde el resultado se reencuadra sin repetir la foto: un recorte malo es la causa más común de una identificación mala.
 - 🔊 **Escuchar el canto** de la especie identificada, desde el archivo de [xeno-canto](https://xeno-canto.org) (requiere una clave API gratuita, ver abajo). Disponible desde el resultado por foto, la ficha del ave **y cada fila del historial**.
 - 🎤 **Escucha en directo** desde el micrófono, con extracción de mel-espectrograma propia (`MelSpectrogramExtractor`, `filterbank1/2.bin`).
 - 🌙 **Escucha en segundo plano** (opt-in, `Ajustes → Segundo plano`): sigue identificando con la app minimizada o la pantalla bloqueada, con auto-apagado configurable para no drenar la batería. Sobrevive interrupciones (llamadas, Siri).
@@ -67,6 +68,7 @@ BirdApp/
 │   ├── MelSpectrogramExtractor.swift  # Pre-proceso (mel-espectrograma)
 │   ├── BirdNETAnalyzer.swift      # Inferencia con el modelo BirdNET
 │   ├── PhotoIdentifier.swift / PhotoView.swift     # Identificación por foto
+│   ├── PhotoFramingView.swift     # Encuadre manual (tocar sujeto o recortar)
 │   ├── XenoCantoService.swift / BirdSongPlayer.swift  # Búsqueda y reproducción de cantos
 │   ├── BirdIdentifier.swift / BirdDetection.swift  # Lógica de identificación
 │   ├── ModelManager.swift         # Carga de los modelos

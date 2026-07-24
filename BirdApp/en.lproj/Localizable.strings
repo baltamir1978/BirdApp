@@ -134,3 +134,14 @@
 "Auto-stop After" = "Auto-stop After";
 "Background" = "Background";
 "Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here." = "Keeps identifying birds while the app is in the background or the screen is locked. The microphone stays active (iOS shows an orange dot) and it uses more battery, so listening stops automatically after the time set here.";
+
+/* Photo framing */
+"Frame the bird" = "Frame the bird";
+"Identify" = "Identify";
+"Whole photo" = "Whole photo";
+"Looking for the subject…" = "Looking for the subject…";
+"Drag a box around the bird" = "Drag a box around the bird";
+"Tap the bird, or drag a box around it" = "Tap the bird, or drag a box around it";
+"Drag to move, corners to resize" = "Drag to move, corners to resize";
+"Selected area" = "Selected area";
+"Adjust" = "Adjust";

@@ -42,6 +42,8 @@ final class PhotoIdentifier {
     private(set) var fusionHint: FusionHint?
     // Which classifier produced the current result, for the UI to disclose.
     private(set) var usedIberianModel = false
+    // True when the crop came from the user's own framing rather than saliency.
+    private(set) var usedManualRegion = false
 
     var locationProvider: (() -> CLLocationCoordinate2D?)?
 
@@ -159,7 +161,10 @@ final class PhotoIdentifier {
 
     // MARK: - Identification
 
-    func identify(_ image: UIImage) async {
+    // `region` is the area the user framed, normalised (0…1) against the upright
+    // image with a top-left origin. When nil we fall back to automatic saliency
+    // framing, which is also what the "Whole photo" button asks for.
+    func identify(_ image: UIImage, region: CGRect? = nil) async {
         let coordinate = locationProvider?()
         guard let (activeModel, iberian) = model(for: coordinate) else {
             phase = .failed(NSLocalizedString("Photo model not available", comment: ""))
@@ -175,12 +180,14 @@ final class PhotoIdentifier {
         candidates = []
         fusionHint = nil
         usedIberianModel = iberian
+        usedManualRegion = region != nil
 
         let orientation = Self.cgOrientation(image.imageOrientation)
 
         // Vision work is not cheap — keep it off the main actor.
         let outcome = await Task.detached(priority: .userInitiated) { [backgroundLabel] in
-            let cropped = Self.cropToSubject(cgImage, orientation: orientation)
+            let cropped = region.map { Self.crop(cgImage, to: $0) }
+                ?? Self.cropToSubject(cgImage, orientation: orientation)
             let request = VNCoreMLRequest(model: activeModel)
             request.imageCropAndScaleOption = .centerCrop
 
@@ -254,6 +261,7 @@ final class PhotoIdentifier {
         candidates = []
         analysedImage = nil
         fusionHint = nil
+        usedManualRegion = false
     }
 
     private struct Outcome: Sendable {
@@ -398,6 +406,23 @@ final class PhotoIdentifier {
               rect.width * rect.height < width * height * 0.95,
               let cropped = image.cropping(to: rect)
         else { return image }
+        return cropped
+    }
+
+    // The user's own framing. Grown to a square around its centre for the same
+    // reason `cropToSubject` does it: `.centerCrop` would otherwise shave the
+    // long side of a rectangle off, cutting the tail or the beak the user was
+    // careful to include.
+    nonisolated private static func crop(_ image: CGImage, to region: CGRect) -> CGImage {
+        let width = CGFloat(image.width), height = CGFloat(image.height)
+        let rect = CGRect(x: region.minX * width, y: region.minY * height,
+                          width: region.width * width, height: region.height * height)
+        let side = max(rect.width, rect.height)
+        let square = CGRect(x: rect.midX - side / 2, y: rect.midY - side / 2, width: side, height: side)
+            .intersection(CGRect(x: 0, y: 0, width: width, height: height))
+
+        guard square.width > 16, square.height > 16,
+              let cropped = image.cropping(to: square.integral) else { return image }
         return cropped
     }
 

@@ -11,8 +11,17 @@ struct PhotoView: View {
     @State private var pickerItem: PhotosPickerItem?
     @State private var sourceImage: UIImage?
     @State private var showCamera = false
+    @State private var framing: FramingRequest?
     @State private var selectedBird: BirdDetection?
     @State private var loadError: String?
+
+    // A photo waiting for the user to say where the bird is. Wrapped because
+    // `sheet(item:)` needs identity and two shots of the same bird are not the
+    // same photo.
+    private struct FramingRequest: Identifiable {
+        let id = UUID()
+        let image: UIImage
+    }
 
     var body: some View {
         NavigationStack {
@@ -50,9 +59,17 @@ struct PhotoView: View {
                 CameraPicker { image in
                     showCamera = false
                     guard let image else { return }
-                    analyse(image)
+                    present(image)
                 }
                 .ignoresSafeArea()
+            }
+            .fullScreenCover(item: $framing) { request in
+                PhotoFramingView(image: request.image) {
+                    framing = nil
+                } onConfirm: { region in
+                    framing = nil
+                    analyse(request.image, region: region)
+                }
             }
             .onChange(of: pickerItem) { _, item in
                 guard let item else { return }
@@ -89,24 +106,35 @@ struct PhotoView: View {
                 .padding(.horizontal)
 
             // What the model actually looked at, once we know it — plus which
-            // classifier ran, so an odd result is at least explicable.
+            // classifier ran, so an odd result is at least explicable. Tapping
+            // it goes back to the framing screen: a wrong crop is the single
+            // most common reason for a wrong answer, and re-cropping beats
+            // taking the photo again.
             if let crop = identifier.analysedImage {
-                HStack(spacing: 8) {
-                    Image(uiImage: crop)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 44, height: 44)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("Analysed area")
-                        if identifier.hasIberianModel {
-                            Text(identifier.usedIberianModel ? "Iberian model" : "Worldwide model")
-                                .foregroundStyle(.tertiary)
+                Button {
+                    framing = FramingRequest(image: image)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(uiImage: crop)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 44, height: 44)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(identifier.usedManualRegion ? "Selected area" : "Analysed area")
+                            if identifier.hasIberianModel {
+                                Text(identifier.usedIberianModel ? "Iberian model" : "Worldwide model")
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
+                        .font(.caption)
+                        Label("Adjust", systemImage: "crop")
+                            .font(.caption)
+                            .labelStyle(.titleAndIcon)
                     }
-                    .font(.caption)
                     .foregroundStyle(.secondary)
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -195,24 +223,49 @@ struct PhotoView: View {
                 loadError = NSLocalizedString("Could not read the photo", comment: "")
                 return
             }
-            analyse(image)
+            present(image)
         } catch {
             loadError = error.localizedDescription
         }
         pickerItem = nil
     }
 
-    private func analyse(_ image: UIImage) {
+    // Every photo — camera or library — stops at the framing screen first.
+    // The image is redrawn upright there and then, so the rectangle that comes
+    // back lines up with the pixels the classifier will see.
+    private func present(_ image: UIImage) {
+        loadError = nil
+        framing = FramingRequest(image: image.uprighted())
+    }
+
+    private func analyse(_ image: UIImage, region: CGRect?) {
         loadError = nil
         identifier.reset()
         sourceImage = image
         Task {
-            await identifier.identify(image)
+            await identifier.identify(image, region: region)
             // `identify` already enriched the candidates with a Wikipedia photo;
             // only the best one goes to history, as with an audio detection.
             if identifier.phase == .done, let top = identifier.candidates.first {
                 store.add(top)
             }
+        }
+    }
+}
+
+// MARK: - Orientation
+
+extension UIImage {
+    // Redraw with the EXIF orientation baked into the pixels. Photos from the
+    // camera are usually `.right`, and without this every rectangle the user
+    // drags would be rotated by the time it reached `CGImage.cropping`.
+    func uprighted() -> UIImage {
+        guard imageOrientation != .up else { return self }
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = scale
+        format.opaque = false
+        return UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
         }
     }
 }
