@@ -32,7 +32,9 @@ class DetectionStore {
 
     func setCandidates(_ candidates: [BirdDetection]) {
         latestCandidates = candidates
-        if let top = candidates.first {
+        // The entry that reaches history remembers which runners-up were too
+        // close to call, so the user can settle it later from the detail view.
+        if let top = candidates.topCarryingCloseCalls() {
             latestDetection = top
             record(top)
         }
@@ -68,6 +70,26 @@ class DetectionStore {
             guard !Task.isCancelled else { return }
             self?.latestCandidates = []
         }
+    }
+
+    // The user settled a close call: this sighting was the other species. Applied
+    // wherever that entry lives — history, the live card and the last-detection
+    // slot the widgets read — and returned so the caller can show the new winner.
+    @discardableResult
+    func choose(_ alternative: BirdDetection.Alternative,
+                for detection: BirdDetection) -> BirdDetection {
+        var corrected = detection
+        corrected.choose(alternative)
+
+        if let idx = detections.firstIndex(where: { $0.id == detection.id }) {
+            detections[idx] = corrected
+        }
+        if latestDetection?.id == detection.id { latestDetection = corrected }
+        if let idx = latestCandidates.firstIndex(where: { $0.id == detection.id }) {
+            latestCandidates[idx] = corrected
+        }
+        save()
+        return corrected
     }
 
     // Delete one detection.

@@ -21,7 +21,18 @@ struct PhotoView: View {
     private struct FramingRequest: Identifiable {
         let id = UUID()
         let image: UIImage
+        // Carried alongside the pixels: where and when the shot was taken, so the
+        // location filter scores the bird against the right place and season.
+        var metadata = PhotoMetadata()
     }
+
+    // Kept so re-cropping from the result card reuses the original photo's
+    // location instead of quietly falling back to the current one.
+    @State private var sourceMetadata = PhotoMetadata()
+
+    // The history entry this photo produced. Held on to so a tiebreak correction
+    // can be written back to it, and so the song button follows the correction.
+    @State private var saved: BirdDetection?
 
     var body: some View {
         NavigationStack {
@@ -68,7 +79,7 @@ struct PhotoView: View {
                     framing = nil
                 } onConfirm: { region in
                     framing = nil
-                    analyse(request.image, region: region)
+                    analyse(request.image, region: region, metadata: request.metadata)
                 }
             }
             .onChange(of: pickerItem) { _, item in
@@ -112,7 +123,7 @@ struct PhotoView: View {
             // taking the photo again.
             if let crop = identifier.analysedImage {
                 Button {
-                    framing = FramingRequest(image: image)
+                    framing = FramingRequest(image: image, metadata: sourceMetadata)
                 } label: {
                     HStack(spacing: 8) {
                         Image(uiImage: crop)
@@ -156,6 +167,14 @@ struct PhotoView: View {
         case .done:
             VStack(spacing: 12) {
                 DetectionResults(candidates: identifier.candidates, selectedBird: $selectedBird)
+
+                // Two look-alikes within a few points of each other: ask instead
+                // of quietly keeping whichever the model preferred.
+                if let saved, saved.needsTiebreak {
+                    SpeciesTiebreaker(detection: saved) { alternative in
+                        self.saved = store.choose(alternative, for: saved)
+                    }
+                }
                 // Say it out loud when a recent song is what tipped the ranking,
                 // rather than silently reordering behind the user's back.
                 if let hint = identifier.fusionHint {
@@ -167,8 +186,9 @@ struct PhotoView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
-                if let top = identifier.candidates.first {
-                    SongPlayButton(scientificName: top.scientificName)
+                // The song follows the user's choice, not the model's ranking.
+                if let scientificName = saved?.scientificName ?? identifier.candidates.first?.scientificName {
+                    SongPlayButton(scientificName: scientificName)
                         .padding(.horizontal)
                 }
             }
@@ -223,7 +243,9 @@ struct PhotoView: View {
                 loadError = NSLocalizedString("Could not read the photo", comment: "")
                 return
             }
-            present(image)
+            // Read the EXIF from the original bytes: `UIImage` drops it, and by
+            // the framing screen the photo has been redrawn and it is gone.
+            present(image, metadata: PhotoMetadata(data: data))
         } catch {
             loadError = error.localizedDescription
         }
@@ -233,21 +255,25 @@ struct PhotoView: View {
     // Every photo — camera or library — stops at the framing screen first.
     // The image is redrawn upright there and then, so the rectangle that comes
     // back lines up with the pixels the classifier will see.
-    private func present(_ image: UIImage) {
+    private func present(_ image: UIImage, metadata: PhotoMetadata = PhotoMetadata()) {
         loadError = nil
-        framing = FramingRequest(image: image.uprighted())
+        sourceMetadata = metadata
+        framing = FramingRequest(image: image.uprighted(), metadata: metadata)
     }
 
-    private func analyse(_ image: UIImage, region: CGRect?) {
+    private func analyse(_ image: UIImage, region: CGRect?, metadata: PhotoMetadata) {
         loadError = nil
         identifier.reset()
         sourceImage = image
+        saved = nil
         Task {
-            await identifier.identify(image, region: region)
+            await identifier.identify(image, region: region, metadata: metadata)
             // `identify` already enriched the candidates with a Wikipedia photo;
-            // only the best one goes to history, as with an audio detection.
-            if identifier.phase == .done, let top = identifier.candidates.first {
+            // only the best one goes to history, as with an audio detection —
+            // carrying any runner-up close enough for the user to overrule it.
+            if identifier.phase == .done, let top = identifier.candidates.topCarryingCloseCalls() {
                 store.add(top)
+                saved = top
             }
         }
     }

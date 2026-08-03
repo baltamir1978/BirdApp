@@ -11,7 +11,8 @@ App de iOS que identifica aves **por su canto y por foto**, con todos los modelo
 - 🎤 **Escucha en directo** desde el micrófono, con extracción de mel-espectrograma propia (`MelSpectrogramExtractor`, `filterbank1/2.bin`).
 - 🌙 **Escucha en segundo plano** (opt-in, `Ajustes → Segundo plano`): sigue identificando con la app minimizada o la pantalla bloqueada, con auto-apagado configurable para no drenar la batería. Sobrevive interrupciones (llamadas, Siri).
 - 🔗 **Fusión audio↔foto**: al identificar una foto, se da preferencia a las especies oídas por el micrófono en los últimos minutos (desempata candidatos parecidos sin inflar los porcentajes).
-- 📍 **Filtro por ubicación y temporada** (`LocationFilter`): pondera las especies probables según dónde y cuándo estás (influencia configurable).
+- 📍 **Filtro por ubicación y temporada** (`LocationFilter`): pondera las especies probables según dónde y cuándo estás (influencia configurable). En las fotos de la galería se usan **la ubicación y la fecha del propio EXIF**, no las de ahora: una foto de un viaje se puntúa contra el lugar y la época en que se tomó. Las fotos de cámara, que no llevan metadatos, usan la posición actual.
+- 🤔 **Desempate manual entre especies parecidas**: cuando el segundo candidato queda a menos del 35 % del primero, la app pregunta en vez de elegir por ti. Aparece bajo el resultado de la foto y en la ficha de cualquier detección del historial, incluidas las de sonido; tu elección corrige el historial, el canto y los widgets, y se puede deshacer. Los modelos son más débiles justo entre parejas casi idénticas (trepadores, colirrojos, pitos), donde un detalle decide.
 - 🌐 **Nombres comunes nativos** en muchos idiomas (archivos `BirdNET_GLOBAL_6K_V2.4_Labels_*.txt`).
 - 🖼️ **Ficha de cada ave** con imagen y descripción desde Wikipedia (`WikipediaImageService`).
 - 🕑 **Historial de detecciones** con de-duplicación.
@@ -69,6 +70,7 @@ BirdApp/
 │   ├── BirdNETAnalyzer.swift      # Inferencia con el modelo BirdNET
 │   ├── PhotoIdentifier.swift / PhotoView.swift     # Identificación por foto
 │   ├── PhotoFramingView.swift     # Encuadre manual (tocar sujeto o recortar)
+│   ├── SpeciesTiebreaker.swift    # «¿Cuál era?» entre especies casi empatadas
 │   ├── XenoCantoService.swift / BirdSongPlayer.swift  # Búsqueda y reproducción de cantos
 │   ├── BirdIdentifier.swift / BirdDetection.swift  # Lógica de identificación
 │   ├── ModelManager.swift         # Carga de los modelos
@@ -104,6 +106,8 @@ Dos detalles no evidentes, documentados en el propio script: la salida del model
 #### Cobertura del modelo de fotos
 
 964 especies, de las que el 87,8 % mapean directamente contra las 6522 de BirdNET. Sobre una muestra de 96 especies ibéricas comunes cubre el **79 %**; el modelo tiene sesgo norteamericano y le faltan aves habituales en España como *Sturnus unicolor*, *Luscinia megarhynchos*, *Curruca melanocephala*, *Cettia cetti* u *Oriolus oriolus*, con las que devolverá la especie parecida más cercana.
+
+Ese sesgo también aparece entre especies hermanas: con fotos nítidas de un trepador azul (*Sitta europaea*) acierta al 90-93 %, pero en una foto lejana compite de tú a tú con el trepador canadiense (*Sitta canadensis*) y basta mover el recorte unos píxeles para que el orden cambie. Ahí es donde entran el filtro por ubicación y el desempate manual; el filtro suave por sí solo no siempre separa una pareja así, porque el meta-modelo de BirdNET todavía concede una probabilidad residual a la especie americana en el norte peninsular.
 
 > ⚠️ Estos ficheros pueden ser grandes. Considera **Git LFS** para versionarlos (ver REVISION.md).
 

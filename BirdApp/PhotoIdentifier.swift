@@ -1,8 +1,59 @@
 import CoreLocation
 import CoreML
+import ImageIO
 import Observation
 import UIKit
 import Vision
+
+// Where and when a photo was taken, read from its own EXIF/GPS block.
+//
+// This matters more than it looks: the location filter asks "how likely is this
+// species here, this week?", and for a photo the honest answer is the place and
+// date of the *photo*, not of the phone right now. Opening last spring's holiday
+// shots from Canada would otherwise be scored against wherever you are today.
+struct PhotoMetadata: Sendable {
+    var coordinate: CLLocationCoordinate2D?
+    var date: Date?
+
+    var isEmpty: Bool { coordinate == nil && date == nil }
+
+    init() {}
+
+    // Camera captures arrive as a bare UIImage with no metadata, so this is only
+    // ever populated for photos picked from the library.
+    init(data: Data) {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        else { return }
+
+        if let gps = properties[kCGImagePropertyGPSDictionary] as? [CFString: Any],
+           let lat = gps[kCGImagePropertyGPSLatitude] as? Double,
+           let lon = gps[kCGImagePropertyGPSLongitude] as? Double {
+            // EXIF stores magnitudes plus a hemisphere reference.
+            let signedLat = (gps[kCGImagePropertyGPSLatitudeRef] as? String) == "S" ? -lat : lat
+            let signedLon = (gps[kCGImagePropertyGPSLongitudeRef] as? String) == "W" ? -lon : lon
+            let candidate = CLLocationCoordinate2D(latitude: signedLat, longitude: signedLon)
+            if CLLocationCoordinate2DIsValid(candidate), !(signedLat == 0 && signedLon == 0) {
+                coordinate = candidate
+            }
+        }
+
+        if let exif = properties[kCGImagePropertyExifDictionary] as? [CFString: Any],
+           let taken = exif[kCGImagePropertyExifDateTimeOriginal] as? String {
+            date = Self.exifFormatter.date(from: taken)
+        }
+    }
+
+    // EXIF timestamps carry no time zone; they are local to where the shot was
+    // taken. Parsing them as local time is the closest we can get, and the filter
+    // only needs the week of the year.
+    private static let exifFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy:MM:dd HH:mm:ss"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+}
 
 // Identifies a bird from a still photo, mirroring the audio pipeline:
 //
@@ -164,8 +215,13 @@ final class PhotoIdentifier {
     // `region` is the area the user framed, normalised (0…1) against the upright
     // image with a top-left origin. When nil we fall back to automatic saliency
     // framing, which is also what the "Whole photo" button asks for.
-    func identify(_ image: UIImage, region: CGRect? = nil) async {
-        let coordinate = locationProvider?()
+    //
+    // `metadata` is the photo's own EXIF/GPS, which wins over the device's current
+    // position: it says where the bird actually was. Camera shots carry none, so
+    // there we fall back to the live location.
+    func identify(_ image: UIImage, region: CGRect? = nil, metadata: PhotoMetadata = PhotoMetadata()) async {
+        let coordinate = metadata.coordinate ?? locationProvider?()
+        let takenAt = metadata.date ?? Date()
         guard let (activeModel, iberian) = model(for: coordinate) else {
             phase = .failed(NSLocalizedString("Photo model not available", comment: ""))
             return
@@ -233,7 +289,7 @@ final class PhotoIdentifier {
             return
         }
 
-        candidates = build(from: outcome.ranked, coordinate: coordinate)
+        candidates = build(from: outcome.ranked, coordinate: coordinate, date: takenAt)
         guard let best = candidates.first, best.confidence >= Self.minimumTop else {
             candidates = []
             phase = .noBird
@@ -276,11 +332,12 @@ final class PhotoIdentifier {
     // Turn raw model classes into BirdDetections, applying the same soft
     // location/season filter the audio path uses (whoBIRD style), then re-rank.
     private func build(from ranked: [(identifier: String, confidence: Double)],
-                       coordinate: CLLocationCoordinate2D?) -> [BirdDetection] {
+                       coordinate: CLLocationCoordinate2D?,
+                       date: Date) -> [BirdDetection] {
         let influence = Float(UserDefaults.standard.double(forKey: "location_filter_influence"))
         var metaScores: [Float]?
         if influence > 0, let filter = locationFilter, let coordinate {
-            filter.update(lat: coordinate.latitude, lon: coordinate.longitude, date: Date())
+            filter.update(lat: coordinate.latitude, lon: coordinate.longitude, date: date)
             if !filter.metaScores.isEmpty { metaScores = filter.metaScores }
         }
 

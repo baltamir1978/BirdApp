@@ -42,7 +42,8 @@ struct HistoryView: View {
                         ForEach(groups, id: \.day) { group in
                             Section {
                                 ForEach(group.items) { detection in
-                                    NavigationLink(destination: DetectionDetailView(detection: detection)) {
+                                    NavigationLink(destination: DetectionDetailView(detection: detection,
+                                                                                    store: store)) {
                                         DetectionRow(detection: detection)
                                     }
                                 }
@@ -190,10 +191,19 @@ struct DetectionRow: View {
 // MARK: - DetectionDetailView
 
 struct DetectionDetailView: View {
-    let detection: BirdDetection
+    // Local copy: a tiebreak correction rewrites this entry, and the view has to
+    // follow it (name, photo, song) without waiting to be re-created.
+    @State private var detection: BirdDetection
+    private let store: DetectionStore?
+
     @State private var placeName: String?
     @State private var article: WikipediaArticle?
     @State private var isLoadingArticle = true
+
+    init(detection: BirdDetection, store: DetectionStore? = nil) {
+        _detection = State(initialValue: detection)
+        self.store = store
+    }
 
     var body: some View {
         ScrollView {
@@ -219,6 +229,18 @@ struct DetectionDetailView: View {
 
                 SongPlayButton(scientificName: detection.scientificName)
                     .padding(.horizontal)
+
+                // A close call left unsettled at the time can be settled here,
+                // with the bird in front of you and no hurry.
+                if let store, detection.needsTiebreak {
+                    SpeciesTiebreaker(detection: detection) { alternative in
+                        detection = store.choose(alternative, for: detection)
+                        // The article and place were fetched for the old species.
+                        article = nil
+                        isLoadingArticle = true
+                        Task { await loadArticle() }
+                    }
+                }
 
                 // Wikipedia summary + link (in the app language, English fallback)
                 if isLoadingArticle {
@@ -281,10 +303,7 @@ struct DetectionDetailView: View {
         }
         .navigationTitle(detection.displayName)
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            article = await WikipediaImageService.shared.article(for: detection.scientificName)
-            isLoadingArticle = false
-        }
+        .task { await loadArticle() }
         .task {
             guard let coord = detection.coordinate else { return }
             let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
@@ -306,6 +325,12 @@ struct DetectionDetailView: View {
                 }
             }
         }
+    }
+
+    // Re-run after a tiebreak too, since the summary describes the species.
+    private func loadArticle() async {
+        article = await WikipediaImageService.shared.article(for: detection.scientificName)
+        isLoadingArticle = false
     }
 
     private var placeholder: some View {

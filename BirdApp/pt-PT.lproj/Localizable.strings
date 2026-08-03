@@ -145,3 +145,7 @@
 "Drag to move, corners to resize" = "Arraste para mover; os cantos para redimensionar";
 "Selected area" = "Área selecionada";
 "Adjust" = "Ajustar";
+
+/* Species tiebreaker */
+"These species look alike. Which one was it?" = "Estas espécies são parecidas. Qual era?";
+"Saved with your choice" = "Guardado com a sua escolha";
