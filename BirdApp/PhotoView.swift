@@ -7,6 +7,8 @@ import SwiftUI
 struct PhotoView: View {
     var identifier: PhotoIdentifier
     var store: DetectionStore
+    // Photos handed to us from the Photos share sheet, via BirdShare.
+    var incoming: IncomingPhotoRouter
 
     @State private var pickerItem: PhotosPickerItem?
     @State private var sourceImage: UIImage?
@@ -86,6 +88,12 @@ struct PhotoView: View {
                 guard let item else { return }
                 Task { await load(item) }
             }
+            // A shared photo may be waiting before this tab has ever been built
+            // (a cold launch from the share sheet lands here), so check on
+            // appear as well as on change — `onChange` never fires for a value
+            // that was already set.
+            .onAppear { consumeIncoming() }
+            .onChange(of: incoming.pending) { _, _ in consumeIncoming() }
         }
     }
 
@@ -250,6 +258,17 @@ struct PhotoView: View {
             loadError = error.localizedDescription
         }
         pickerItem = nil
+    }
+
+    // A photo shared from Photos enters exactly where a picked one does: the
+    // framing screen, carrying the location and date read from its own EXIF.
+    private func consumeIncoming() {
+        guard let item = incoming.pending else { return }
+        incoming.clear()
+        identifier.reset()
+        sourceImage = nil
+        saved = nil
+        present(item.image, metadata: item.metadata)
     }
 
     // Every photo — camera or library — stops at the framing screen first.

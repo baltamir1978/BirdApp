@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var locationManager = LocationManager()
     @State private var modelManager = ModelManager()
     @State private var photoIdentifier = PhotoIdentifier()
+    @State private var incomingPhoto = IncomingPhotoRouter()
 
     @AppStorage("onboarding_done") private var onboardingDone = false
     @AppStorage("background_listening") private var backgroundListening = false
@@ -21,7 +22,7 @@ struct ContentView: View {
                 .tabItem { Label("Listen", systemImage: "mic.fill") }
                 .tag(0)
 
-            PhotoView(identifier: photoIdentifier, store: store)
+            PhotoView(identifier: photoIdentifier, store: store, incoming: incomingPhoto)
                 .tabItem { Label("Photo", systemImage: "camera.fill") }
                 .tag(1)
 
@@ -48,6 +49,11 @@ struct ContentView: View {
             selectedTab = 0
             startCapture()
         }
+        // A photo shared from Photos: the extension parked it in the App Group
+        // and opened us on it. Jump to the Photo tab, which picks it up.
+        .onOpenURL { url in
+            if incomingPhoto.handle(url) { selectedTab = 1 }
+        }
         // Widget "Stop" reached us via a Darwin signal re-posted as this notification.
         .onReceive(NotificationCenter.default.publisher(for: .stopBirdListening)) { _ in
             analyzer.stopListening()
@@ -66,6 +72,10 @@ struct ContentView: View {
                 }
             case .active:
                 analyzer.cancelBackgroundStop()
+                // Safety net: if the share extension failed to open us, the
+                // photo is still sitting in the App Group. Claim it now rather
+                // than lose the shot.
+                if incomingPhoto.claimPending() { selectedTab = 1 }
             default:
                 break
             }

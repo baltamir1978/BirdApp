@@ -6,6 +6,7 @@ App de iOS que identifica aves **por su canto y por foto**, con todos los modelo
 
 - 🐦 **Identificación de aves por sonido** con el modelo [BirdNET](https://birdnet.cornell.edu/) (BirdNET_GLOBAL_6K_V2.4) ejecutado localmente vía **Core ML**.
 - 📷 **Identificación por foto** (pestaña *Foto*): elige una imagen o dispara con la cámara y la clasifica en el dispositivo. Usa [Google AIY Birds V1](https://www.kaggle.com/models/google/aiy) (MobileNetV2 entrenado con iNaturalist, 964 especies) convertido a Core ML. Los resultados se mapean a la taxonomía de BirdNET, así que reutilizan los nombres nativos y el filtro por ubicación.
+- 📤 **Compartir desde Fotos**: BirdApp aparece en la hoja de compartir de Fotos (y de Safari, Mensajes, WhatsApp…). La extensión `BirdShare` deja la imagen **original, con su EXIF intacto** en el App Group y abre la app en la pestaña *Foto*, que sigue con el flujo de siempre: encuadre, clasificación, historial y canto.
 - ✂️ **Encuadre manual del ave**: toda foto —de la cámara o de la galería— pasa por una pantalla donde decides qué mirar. Un toque sobre el pájaro lo selecciona (segmentación de sujetos de Vision, el mismo motor del «levantar sujeto del fondo» de iOS), o arrastras un recuadro a mano; también puedes dejar el recorte automático por saliencia. Desde el resultado se reencuadra sin repetir la foto: un recorte malo es la causa más común de una identificación mala.
 - 🔊 **Escuchar el canto** de la especie identificada, desde el archivo de [xeno-canto](https://xeno-canto.org) (requiere una clave API gratuita, ver abajo). Disponible desde el resultado por foto, la ficha del ave **y cada fila del historial**.
 - 🎤 **Escucha en directo** desde el micrófono, con extracción de mel-espectrograma propia (`MelSpectrogramExtractor`, `filterbank1/2.bin`).
@@ -70,6 +71,7 @@ BirdApp/
 │   ├── BirdNETAnalyzer.swift      # Inferencia con el modelo BirdNET
 │   ├── PhotoIdentifier.swift / PhotoView.swift     # Identificación por foto
 │   ├── PhotoFramingView.swift     # Encuadre manual (tocar sujeto o recortar)
+│   ├── IncomingPhotoRouter.swift  # Fotos que llegan de la hoja de compartir
 │   ├── SpeciesTiebreaker.swift    # «¿Cuál era?» entre especies casi empatadas
 │   ├── XenoCantoService.swift / BirdSongPlayer.swift  # Búsqueda y reproducción de cantos
 │   ├── BirdIdentifier.swift / BirdDetection.swift  # Lógica de identificación
@@ -80,8 +82,12 @@ BirdApp/
 │   ├── SettingsView.swift / BirdDetailView.swift
 │   └── BirdNET_*_Labels_*.txt     # Etiquetas en múltiples idiomas
 ├── BirdWidget/                    # Extensión de widgets
-├── Info.plist                     # Base fusionada con las claves generadas (UIBackgroundModes=audio)
-├── Tools/                         # Scripts (widget, modelos, tooling del clasificador ibérico)
+├── BirdShare/                     # Extensión de compartir (entrada desde Fotos)
+│   └── ShareViewController.swift  # Puente: guarda la foto y abre la app
+├── Shared/                        # Código compilado en la app y sus extensiones
+│   └── SharedPhotoInbox.swift     # Buzón de fotos en el App Group
+├── Info.plist                     # Base fusionada con las claves generadas (UIBackgroundModes=audio, esquema birdapp://)
+├── Tools/                         # Scripts (widget, compartir, modelos, tooling del clasificador ibérico)
 └── PrivacyInfo.xcprivacy          # Manifiesto de privacidad
 ```
 

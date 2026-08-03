@@ -8,19 +8,31 @@
 
 /* Begin PBXBuildFile section */
 		0881E6DE04412072AC0A00FE /* BirdWidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9751BF090FB4EF093CC7F909 /* BirdWidgetShared.swift */; };
+		11959C0DD5F9607AFA0F37A2 /* SharedPhotoInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39FB12B3981E75BA9C92796E /* SharedPhotoInbox.swift */; };
 		153C63C72FCA4129009682A9 /* MelSpectrogramExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153C63C62FCA4129009682A9 /* MelSpectrogramExtractor.swift */; };
 		15960FBB2FCEC146004DE3BA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 15960FBA2FCEC146004DE3BA /* PrivacyInfo.xcprivacy */; };
 		1A379B01212B90C671893893 /* BirdIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F884D1EB6B48161E206B0194 /* BirdIntents.swift */; };
 		277F6FE6D1F357B37C3D1AB3 /* ListenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78763E2C7824255927C7AE58 /* ListenWidget.swift */; };
+		280437FB745BBCE641670D6E /* SharedPhotoInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39FB12B3981E75BA9C92796E /* SharedPhotoInbox.swift */; };
 		3B4604A8FCC650FA83E073D6 /* BirdWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649D5C1A554A6C9ADDCB0BE9 /* BirdWidgetBundle.swift */; };
 		431C1C4EF6D1367C2133F24B /* BirdWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DE3C68F7D1380FAA2834FABD /* BirdWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		454A8D15CAC4F20667C8A104 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82A7212D20E8F6FD4E8CAD17 /* ShareViewController.swift */; };
 		4D66C5ABDA8C937048429348 /* LastBirdWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A648550A6E0CAB8C52C0EEA1 /* LastBirdWidget.swift */; };
 		5708D04A6C527B13541B3527 /* BirdIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F884D1EB6B48161E206B0194 /* BirdIntents.swift */; };
+		65E0B98BC9AAB245A2468F66 /* BirdShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6FE83371F90CD7F00D9F48A4 /* BirdShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		712E7C9C1EB7BC0A4B6E5600 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = ED624740B2F6E6654862B332 /* Localizable.strings */; };
 		A70987160A48DD726C00A5EC /* BirdWidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9751BF090FB4EF093CC7F909 /* BirdWidgetShared.swift */; };
+		E48B7A798C9D46E0653E8D61 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27AC72A09141B82E7B9AADAF /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		7D63CCBE067E7135488B1316 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 153C63902FC9B595009682A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0EE0CAD686DA55836B018A11;
+			remoteInfo = BirdShare;
+		};
 		8404F6FFCA6244B55C560FD8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 153C63902FC9B595009682A9 /* Project object */;
@@ -38,6 +50,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				431C1C4EF6D1367C2133F24B /* BirdWidget.appex in Embed Foundation Extensions */,
+				65E0B98BC9AAB245A2468F66 /* BirdShare.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -45,18 +58,29 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A8DAAA3EF8503602339CCB7 /* BirdShare.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = BirdShare.entitlements; sourceTree = "<group>"; };
+		0B495345A21E492954812B3A /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		153C63982FC9B595009682A9 /* BirdApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BirdApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		153C63C62FCA4129009682A9 /* MelSpectrogramExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelSpectrogramExtractor.swift; sourceTree = "<group>"; };
 		15960FBA2FCEC146004DE3BA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		30A36E98948E883D78EF0D42 /* it */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		39FB12B3981E75BA9C92796E /* SharedPhotoInbox.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedPhotoInbox.swift; sourceTree = "<group>"; };
+		61F9683D5C0B3D2184E527C7 /* pt-PT */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		649D5C1A554A6C9ADDCB0BE9 /* BirdWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BirdWidgetBundle.swift; sourceTree = "<group>"; };
+		6FE83371F90CD7F00D9F48A4 /* BirdShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BirdShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		78763E2C7824255927C7AE58 /* ListenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ListenWidget.swift; sourceTree = "<group>"; };
 		7E06DE9BA9A6495A5D23CA2F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		807DF9EF07561303B744FFA8 /* de */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		82A7212D20E8F6FD4E8CAD17 /* ShareViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		9751BF090FB4EF093CC7F909 /* BirdWidgetShared.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BirdWidgetShared.swift; sourceTree = "<group>"; };
+		A0C2E76569F75E77DA9EE394 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A648550A6E0CAB8C52C0EEA1 /* LastBirdWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LastBirdWidget.swift; sourceTree = "<group>"; };
+		A831EF3029A2ABEFC3B3075D /* de */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		ADD053E4DE79F3959A463561 /* pt-PT */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B08BCB6512F5BA11D693061A /* es */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		BAB4BF65341A81F6BE8C9099 /* es */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CAAAA97083BA569C7B19A742 /* it */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CD32895533FCB5B85B8E1140 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DE3C68F7D1380FAA2834FABD /* BirdWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BirdWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E759E352C92C8ED695A6378F /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E9A5E4473A6733FE10F2CD1D /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -75,6 +99,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		153C63952FC9B595009682A9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		853675645054C77D634DF969 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -104,6 +135,7 @@
 			children = (
 				9751BF090FB4EF093CC7F909 /* BirdWidgetShared.swift */,
 				F884D1EB6B48161E206B0194 /* BirdIntents.swift */,
+				39FB12B3981E75BA9C92796E /* SharedPhotoInbox.swift */,
 			);
 			name = Shared;
 			path = Shared;
@@ -119,6 +151,7 @@
 				15960FBA2FCEC146004DE3BA /* PrivacyInfo.xcprivacy */,
 				70339BBF707AADD63F7CE345 /* BirdWidget */,
 				10B2B083231D5102AED1625C /* Shared */,
+				6B15B88C17C5334149189EAA /* BirdShare */,
 			);
 			sourceTree = "<group>";
 		};
@@ -127,6 +160,7 @@
 			children = (
 				153C63982FC9B595009682A9 /* BirdApp.app */,
 				DE3C68F7D1380FAA2834FABD /* BirdWidget.appex */,
+				6FE83371F90CD7F00D9F48A4 /* BirdShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -137,6 +171,18 @@
 				0F8B19C2AF8489A62B2750E4 /* iOS */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6B15B88C17C5334149189EAA /* BirdShare */ = {
+			isa = PBXGroup;
+			children = (
+				82A7212D20E8F6FD4E8CAD17 /* ShareViewController.swift */,
+				CD32895533FCB5B85B8E1140 /* Info.plist */,
+				0A8DAAA3EF8503602339CCB7 /* BirdShare.entitlements */,
+				27AC72A09141B82E7B9AADAF /* Localizable.strings */,
+			);
+			name = BirdShare;
+			path = BirdShare;
 			sourceTree = "<group>";
 		};
 		70339BBF707AADD63F7CE345 /* BirdWidget */ = {
@@ -154,6 +200,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0EE0CAD686DA55836B018A11 /* BirdShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 17E5DAAB53295AC6EE099268 /* Build configuration list for PBXNativeTarget "BirdShare" */;
+			buildPhases = (
+				0DDFF9DFE247431EC7182ABF /* Sources */,
+				853675645054C77D634DF969 /* Frameworks */,
+				E8E2558854DB2314360C5634 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BirdShare;
+			productName = BirdShare;
+			productReference = 6FE83371F90CD7F00D9F48A4 /* BirdShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		153C63972FC9B595009682A9 /* BirdApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 153C63A32FC9B597009682A9 /* Build configuration list for PBXNativeTarget "BirdApp" */;
@@ -167,6 +230,7 @@
 			);
 			dependencies = (
 				6F73CCD03FC8FB554217FBC7 /* PBXTargetDependency */,
+				7AC384E7794B7093212530BA /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				153C639A2FC9B595009682A9 /* BirdApp */,
@@ -229,6 +293,7 @@
 			targets = (
 				153C63972FC9B595009682A9 /* BirdApp */,
 				BDA7B6B42752290A39664271 /* BirdWidget */,
+				0EE0CAD686DA55836B018A11 /* BirdShare */,
 			);
 		};
 /* End PBXProject section */
@@ -250,9 +315,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8E2558854DB2314360C5634 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E48B7A798C9D46E0653E8D61 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0DDFF9DFE247431EC7182ABF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				454A8D15CAC4F20667C8A104 /* ShareViewController.swift in Sources */,
+				280437FB745BBCE641670D6E /* SharedPhotoInbox.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		153C63942FC9B595009682A9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -260,6 +342,7 @@
 				153C63C72FCA4129009682A9 /* MelSpectrogramExtractor.swift in Sources */,
 				0881E6DE04412072AC0A00FE /* BirdWidgetShared.swift in Sources */,
 				1A379B01212B90C671893893 /* BirdIntents.swift in Sources */,
+				11959C0DD5F9607AFA0F37A2 /* SharedPhotoInbox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,9 +367,28 @@
 			target = BDA7B6B42752290A39664271 /* BirdWidget */;
 			targetProxy = 8404F6FFCA6244B55C560FD8 /* PBXContainerItemProxy */;
 		};
+		7AC384E7794B7093212530BA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BirdShare;
+			target = 0EE0CAD686DA55836B018A11 /* BirdShare */;
+			targetProxy = 7D63CCBE067E7135488B1316 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		27AC72A09141B82E7B9AADAF /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0B495345A21E492954812B3A /* en */,
+				B08BCB6512F5BA11D693061A /* es */,
+				A0C2E76569F75E77DA9EE394 /* fr */,
+				A831EF3029A2ABEFC3B3075D /* de */,
+				CAAAA97083BA569C7B19A742 /* it */,
+				61F9683D5C0B3D2184E527C7 /* pt-PT */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		ED624740B2F6E6654862B332 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -437,8 +539,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Pájaros uses the camera so you can photograph a bird and identify it.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Pájaros uses the microphone to listen for birds and identify them by their song.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -475,8 +577,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Pájaros uses the camera so you can photograph a bird and identify it.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Pájaros usa tu ubicación para filtrar las detecciones a aves de tu zona.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Pájaros uses the microphone to listen for birds and identify them by their song.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -497,6 +599,36 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		35292E6562A467F33593DDB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = BirdShare/BirdShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JKMR84FU58;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BirdShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = Altamirano.BirdApp.BirdShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -555,6 +687,35 @@
 			};
 			name = Release;
 		};
+		73A62FD143B510375EBA63FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = BirdShare/BirdShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JKMR84FU58;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BirdShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = Altamirano.BirdApp.BirdShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -572,6 +733,15 @@
 			buildConfigurations = (
 				153C63A42FC9B597009682A9 /* Debug */,
 				153C63A52FC9B597009682A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		17E5DAAB53295AC6EE099268 /* Build configuration list for PBXNativeTarget "BirdShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				35292E6562A467F33593DDB3 /* Release */,
+				73A62FD143B510375EBA63FA /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

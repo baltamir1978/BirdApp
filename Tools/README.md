@@ -74,4 +74,5 @@ con el modelo mundial en todas partes.
   convertir con `compute_precision=FLOAT32` — en FLOAT16 el modelo devuelve una
   constante que ignora la entrada.
 - `add_widget_target.rb` — crea el target del widget con la gema `xcodeproj`.
+- `add_share_extension.rb` — crea el target `BirdShare` (la entrada de BirdApp en la hoja de compartir de Fotos). Sólo limpia su propio cableado, así que no toca el widget; vuelve a ejecutarlo tras subir la versión de la app para que la extensión no se quede atrás.
   No es idempotente del todo: ver notas en el propio script antes de re-ejecutar.
