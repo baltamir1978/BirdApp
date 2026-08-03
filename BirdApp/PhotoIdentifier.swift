@@ -11,7 +11,11 @@ import Vision
 // species here, this week?", and for a photo the honest answer is the place and
 // date of the *photo*, not of the phone right now. Opening last spring's holiday
 // shots from Canada would otherwise be scored against wherever you are today.
-struct PhotoMetadata: Sendable {
+// `nonisolated` because the project defaults every unannotated type to the main
+// actor: this is an inert value type read on whatever thread decodes the photo,
+// and its initialiser is used as a default argument, which is evaluated in the
+// caller's context.
+nonisolated struct PhotoMetadata: Sendable {
     var coordinate: CLLocationCoordinate2D?
     var date: Date?
 
@@ -418,7 +422,8 @@ final class PhotoIdentifier {
     static let fusionWindow: TimeInterval = 600
     // Strength at age zero: a species heard seconds ago doubles its score.
     private static let fusionBoost = 1.0
-    private static let rerankPool = 10
+    // Read inside the detached Vision task, hence not on the main actor.
+    nonisolated private static let rerankPool = 10
 
     // Confidence floors: below `minimumTop` we claim nothing rather than show a
     // near-random species; alternatives need more than noise to be worth listing.

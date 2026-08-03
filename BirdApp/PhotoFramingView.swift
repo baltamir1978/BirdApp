@@ -345,7 +345,9 @@ struct DetectedSubject: Identifiable {
 // Wraps Vision's foreground-instance segmentation — the same request behind
 // iOS's "lift subject from background" — and reduces each instance to a
 // bounding box plus an alpha mask the UI can paint.
-enum SubjectDetector {
+// `nonisolated` as a whole: pure image processing that runs off the main actor,
+// which the project would otherwise default it to.
+nonisolated enum SubjectDetector {
 
     // Segmentation runs on a downscaled copy: the masks come back at the size of
     // whatever we hand in, and a 12 MP original would cost far more time and
