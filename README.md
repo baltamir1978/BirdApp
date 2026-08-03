@@ -83,7 +83,7 @@ BirdApp/
 │   └── BirdNET_*_Labels_*.txt     # Etiquetas en múltiples idiomas
 ├── BirdWidget/                    # Extensión de widgets
 ├── BirdShare/                     # Extensión de compartir (entrada desde Fotos)
-│   └── ShareViewController.swift  # Puente: guarda la foto y abre la app
+│   └── ShareViewController.swift  # Puente: guarda la foto y abre la app (vía responder chain)
 ├── Shared/                        # Código compilado en la app y sus extensiones
 │   └── SharedPhotoInbox.swift     # Buzón de fotos en el App Group
 ├── Info.plist                     # Base fusionada con las claves generadas (UIBackgroundModes=audio, esquema birdapp://)

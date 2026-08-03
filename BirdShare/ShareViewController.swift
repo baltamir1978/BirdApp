@@ -92,15 +92,43 @@ final class ShareViewController: UIViewController {
     /// inbox — the app picks it up on its own next launch, so say that rather
     /// than losing the shot silently.
     private func open(_ url: URL) async {
-        guard let context = extensionContext else { return }
-        let opened = await withCheckedContinuation { continuation in
+        guard await openApp(url) else {
+            return present(message: NSLocalizedString("Open BirdApp to identify this photo.", comment: ""))
+        }
+        extensionContext?.completeRequest(returningItems: nil)
+    }
+
+    /// Launches `birdapp://…`.
+    ///
+    /// Through the application the view is hosted in, reached by walking the
+    /// responder chain, and *not* `extensionContext.open`: that one only ever
+    /// worked from a Today widget, and from a share extension it just answers
+    /// `false` — which is why this used to stop at "open the app yourself".
+    /// `UIApplication.open(_:options:completionHandler:)` is public API and,
+    /// unlike `UIApplication.shared`, is not marked unavailable to extensions;
+    /// only the singleton accessor is, hence the walk.
+    ///
+    /// `extensionContext.open` stays as a fallback for the case where no
+    /// application turns up in the chain.
+    private func openApp(_ url: URL) async -> Bool {
+        if let application = hostApplication() {
+            return await withCheckedContinuation { continuation in
+                application.open(url, options: [:]) { continuation.resume(returning: $0) }
+            }
+        }
+        guard let context = extensionContext else { return false }
+        return await withCheckedContinuation { continuation in
             context.open(url) { continuation.resume(returning: $0) }
         }
-        if opened {
-            context.completeRequest(returningItems: nil)
-        } else {
-            present(message: NSLocalizedString("Open BirdApp to identify this photo.", comment: ""))
+    }
+
+    private func hostApplication() -> UIApplication? {
+        var responder: UIResponder? = self
+        while let current = responder {
+            if let application = current as? UIApplication { return application }
+            responder = current.next
         }
+        return nil
     }
 
     // MARK: - Errors
